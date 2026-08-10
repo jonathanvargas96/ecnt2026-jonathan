@@ -1,0 +1,229 @@
+---
+lang: "pt-BR"
+title: "Atividade Prática 1 — Respostas"
+subtitle: "Econometria Aplicada à Finanças <br> Mestrado Profissional em Administração"
+author: "Jonathan Vargas Silva"
+title-block-banner: "#27445C"
+date: 2026-08-04
+date-format: long
+format:
+  html:
+    embed-resources: true
+    toc: true
+    toc-location: left
+    toc-title: "Navegação"
+    code-copy: true
+    fig-dpi: 300
+execute:
+  echo: true
+  warning: false
+  message: false
+engine: knitr
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Os pacotes devem ter sido instalados conforme as instruções da atividade.
+library(tidyverse)
+library(broom)
+library(car)
+library(POE5Rdata)
+
+# Carrega os dados usados na atividade.
+data("capm5", package = "POE5Rdata")
+```
+
+# Questão 1
+
+
+## A
+O modelo econométrico em questão é uma regressão simples porque possui apenas uma variável explicativa (independente): o prêmio de risco do mercado $(r_m - r_f)$, que é usado para tentar explicar a variação da variável dependente (o prêmio de risco do ativo, $r_j - r_f$).
+
+O termo de erro foi incluso porque uma relação teórica perfeita não é possível. Portanto, ele é incluído para capturar:
+
+- Fatores específicos da empresa: eventos próprios do ativo (como decisões da gestão, balanços, greves ou inovações) que afetam seu retorno, mas não dependem do mercado geral.
+
+- Imperfeições dos dados: imprecisões de medição, ruídos e choques aleatórios imprevisíveis.
+Em resumo, $e_j$ representa tudo o que afeta o retorno do ativo, mas que o mercado isoladamente não consegue explicar.
+
+
+## B
+
+O bloco abaixo prepara os retornos excedentes e estima o modelo CAPM para Ford, como referência, para estimar os modelos das demais empresas solicitadas na atividade.
+
+```{r}
+# Calcula os retornos excedentes das ações e da carteira de mercado.
+dados_capm <- capm5 |>
+  mutate(
+    ret_ge_excedente = ge - riskfree,
+    ret_ibm_excedente = ibm - riskfree,
+    ret_ford_excedente = ford - riskfree,
+    ret_msft_excedente = msft - riskfree,
+    ret_dis_excedente = dis - riskfree,
+    ret_xom_excedente = xom - riskfree,
+    ret_mkt_excedente = mkt - riskfree
+  )
+```
+
+```{r}
+# Estima os modelos CAPM das demais empresas.
+# Ford:
+capm_ford <- lm(ret_ford_excedente ~ ret_mkt_excedente, data = dados_capm)
+broom::tidy(capm_ford, conf.int = TRUE)
+
+# IBM:
+capm_ibm <- lm(ret_ibm_excedente ~ ret_mkt_excedente, data = dados_capm)
+broom::tidy(capm_ibm, conf.int = TRUE)
+
+# GE:
+capm_ge <- lm(ret_ge_excedente ~ ret_mkt_excedente, data = dados_capm)
+broom::tidy(capm_ge, conf.int = TRUE)
+
+# Microsoft:
+capm_msft <- lm(ret_msft_excedente ~ ret_mkt_excedente, data = dados_capm)
+broom::tidy(capm_msft, conf.int = TRUE)
+
+# Disney:
+capm_dis <- lm(ret_dis_excedente ~ ret_mkt_excedente, data = dados_capm)
+broom::tidy(capm_dis, conf.int = TRUE)
+
+# Exxon:
+capm_xom <- lm(ret_xom_excedente ~ ret_mkt_excedente, data = dados_capm)
+broom::tidy(capm_xom, conf.int = TRUE)
+
+# Organiza os resultados
+tabela_resultados <- bind_rows(
+  Ford      = broom::tidy(capm_ford, conf.int = TRUE),
+  IBM       = broom::tidy(capm_ibm, conf.int = TRUE),
+  GE        = broom::tidy(capm_ge, conf.int = TRUE),
+  Microsoft = broom::tidy(capm_msft, conf.int = TRUE),
+  Disney    = broom::tidy(capm_dis, conf.int = TRUE),
+  Exxon     = broom::tidy(capm_xom, conf.int = TRUE),
+  .id = "empresa"
+) |> 
+  filter(term == "ret_mkt_excedente") |> 
+  select(empresa, beta = estimate, erro_padrao = std.error, conf.low, conf.high)
+
+print(tabela_resultados)
+```
+
+Com base nas estimativas pontuais dos betas ($\hat{\beta}$), pode-se concluir que a empresa mais agressiva parece ser a Ford ($\hat{\beta} \approx 1,66$). Por ter o maior beta ($\hat{\beta} > 1$), a ação varia proporcionalmente mais do que o mercado. Em contrapartida, a mais defensiva parece ser a Exxon-Mobil ($\hat{\beta} \approx 0,46$). Por ter o menor beta ($\hat{\beta} < 1$), a ação é menos volátil que o mercado.
+
+Analisar apenas a estimativa pontual é insuficiente porque esse valor depende totalmente da amostra de 180 meses utilizada e mudaria em outro período. Além disso, sem o erro-padrão e o intervalo de confiança, não é possível medir a precisão da estimativa nem realizar testes de hipóteses para confirmar se um beta próximo de 1 representa uma diferença real em relação ao mercado ou apenas um ruído do acaso.
+
+
+## C
+
+Usando os modelos estimados no item B para analisar os interceptos solicitados.
+
+```{r}
+# Resultados do modelo da Ford, incluindo intervalo de confiança.
+broom::tidy(capm_ford, conf.int = TRUE)
+
+# Resultados do modelo da General Electric, incluindo intervalo de confiança.
+broom::tidy(capm_ge, conf.int = TRUE)
+
+# Resultados do modelo da Exxon-Mobil, incluindo intervalo de confiança.
+broom::tidy(capm_xom, conf.int = TRUE)
+
+```
+
+Para testar a hipótese nula $H_0: \alpha = 0$ contra a alternativa $H_1: \alpha \neq 0$  ao nível de significância de 5%:
+
+- Ford: O $p$-valor da linha é maior que $0,05$ e o intervalo de confiança inclui o zero. Portanto, não se rejeita $H_0$. Conclui-se que não há evidência estatística suficiente para afirmar que o intercepto é diferente de zero, o que é coerente com a teoria do CAPM;
+
+- General Electric (GE): O $p$-valor do intercepto também é maior que $0,05$ e o intervalo de confiança inclui o zero. Portanto, não se rejeita $H_0$. Não há evidência para rejeitar a hipótese de que o intercepto é igual a zero, o que é coerente com a teoria do CAPM;
+
+- Exxon-Mobil: O $p$-valor do intercepto é maior que $0,05$ e o intervalo de confiança inclui o zero. Portanto, não se rejeita $H_0$. Não há evidência para rejeitar a hipótese de que o intercepto é igual a zero, o que é coerente com a teoria do CAPM.
+
+Portanto, pode-se concluir que, em todos os três casos, os resultados empíricos sustentam a previsão teórica do CAPM de que o termo de intercepto (alfa) é estatisticamente igual a zero.
+
+
+## E
+
+```{r}
+# Obtém os intervalos de confiança dos betas de Exxon-Mobil e Microsoft.
+broom::tidy(capm_msft, conf.int = TRUE) |> 
+  dplyr::filter(term == "ret_mkt_excedente")
+broom::tidy(capm_xom, conf.int = TRUE) |> 
+  dplyr::filter(term == "ret_mkt_excedente")
+```
+
+Com 95% de confiança, o beta da Exxon-Mobil está entre aproximadamente 0,32 e 0,60 (valores exatos na saída do R), e o beta da Microsoft está entre aproximadamente 0,96 e 1,44.
+
+- Exxon-Mobil (β ≈ 0,46): o intervalo inteiro fica abaixo de 1. Isso significa que pode-se afirmar que essa ação é realmente defensiva, visto que ela tende a variar menos que o mercado como um todo. Em momentos de queda do mercado, a Exxon tende a cair menos e em momentos de alta, também deve subir menos. É uma ação mais indicada para quem busca menor volatilidade.
+
+- Microsoft (β ≈ 1,20): o intervalo de confiança inclui o valor 1. Isso indica que, apesar da estimativa pontual sugerir uma ação um pouco mais agressiva que o mercado, não se tem certeza estatística de que o beta seja realmente diferente de 1. Ou seja, não dá para garantir que a Microsoft se comporte de forma mais arriscada que o mercado, visto que ela pode, na prática, ter risco semelhante ao mercado.
+
+Orientação: para um investidor que busca equilíbrio na carteira, a Exxon-Mobil pode ajudar a reduzir a volatilidade, já que seu beta é estatisticamente menor que 1. Já a Microsoft, apesar de a estimativa pontual sugerir um comportamento um pouco mais agressivo, não apresenta diferença estatisticamente significativa em relação ao mercado.
+
+
+## F
+
+```{r}
+# Teste H0: beta da Ford = 1.
+car::linearHypothesis(capm_ford, "ret_mkt_excedente = 1")
+
+# Teste H0: beta da General Electric = 1.
+car::linearHypothesis(capm_ge, "ret_mkt_excedente = 1")
+
+# Teste H0: beta da Exxon-Mobil = 1.
+car::linearHypothesis(capm_xom, "ret_mkt_excedente = 1")
+```
+
+Interpretando o resultado do teste, ao nível de significância de 5%, pode-se concluir que:
+
+- Ford: O $p$-valor do teste é menor que $0,05$. Portanto, rejeita-se $H_0$. Conclui-se que o beta da Ford é estatisticamente diferente de $1$, confirmando que a ação é agressiva e mais volátil do que o mercado;
+
+- General Electric: O $p$-valor do teste é maior que $0,05$. Portanto, não se rejeita $H_0$. Apesar do beta estimado ser $1,15$, a diferença em relação a $1,0$ não é estatisticamente significante. A GE comporta-se com o mesmo nível de risco do mercado;
+
+- Exxon-Mobil: O $p$-valor do teste é menor que $0,05$. Portanto, rejeita-se $H_0$. O beta da Exxon é estatisticamente diferente de $1$, confirmando seu perfil defensivo de menor risco.
+
+No contexto do CAPM, um ativo com $\beta = 1$ possui o mesmo nível de risco sistemático que a carteira de mercado. Isso significa que a ação oscila na mesma proporção e direção do mercado geral, acompanhando exatamente as expansões e retrações econômicas.
+
+
+## G
+
+```{r}
+# Obtém o intervalo de confiança do beta da Exxon-Mobil.
+broom::tidy(capm_xom, conf.int = TRUE) |> 
+  dplyr::filter(term == "ret_mkt_excedente") |> 
+  dplyr::select(term, estimate, std.error, conf.low, conf.high)
+```
+
+Análise do Intervalo de Confiança
+
+- O intervalo de confiança de 95% para o beta da Exxon-Mobil é de aproximadamente [0,32; 0,60]. O valor 1 não está contido no intervalo.
+
+- Como todo o intervalo está estritamente abaixo de $1,0$, os dados fornecem evidência estatística, a um nível de confiança de $95\%$, de que o beta da Exxon-Mobil é menor que 1.
+
+Interpretação Econômica ($\beta < 1$ no CAPM)
+
+- No contexto do CAPM, um beta menor que 1 significa que o ativo é menos volátil ou defensivo em relação ao mercado. Nesse caso, a ação tem uma exposição abaixo da média ao risco sistemático de mercado. Portanto, a sua sensibilidade às oscilações do mercado é menor, visto que, para cada $1\%$ de variação no mercado, a ação tende a variar apenas cerca de $0,46\%$ na mesma direção.
+
+
+## H
+
+```{r}
+# Obtém o intervalo de confiança do beta da Microsoft.
+broom::tidy(capm_msft, conf.int = TRUE) |> 
+  dplyr::filter(term == "ret_mkt_excedente") |> 
+  dplyr::select(term, estimate, std.error, conf.low, conf.high)
+```
+
+- O intervalo de confiança de 95% para o beta da Microsoft é de aproximadamente [0,96; 1,44]. O valor 1 está incluído dentro do intervalo.
+
+- Como o intervalo abrange o valor $1,0$, estatisticamente os dados apontam que o beta da Microsoft é próximo de 1. Embora a estimativa pontual de $1,20$ sugira uma inclinação agressiva, não há evidência estatística suficiente a 95% para afirmar que ela seja estritamente diferente do mercado.
+
+- Um beta maior que 1 indica que o ativo carrega maior risco de mercado do que a média da economia. O ativo reage de forma ampliada às variações da carteira, subindo mais que o mercado em altas e caindo mais em baixas
+
+## I
+
+```{r}
+# R² ajustado do modelo da Ford.
+summary(capm_ford)$adj.r.squared
+```
+
+O $R^2$ ajustado do modelo da Ford (aproximadamente $0,26$ ou $26\%$) indica que cerca de $26\%$ da variação do prêmio de risco das ações da Ford é explicada pelo prêmio de risco do mercado por meio do CAPM, enquanto os $74\%$ restantes são devidos a riscos idiossincráticos e fatores específicos da própria empresa. O $R^2$ ajustado é uma medida superior ao $R^2$ simples porque inclui uma penalidade pelo número de variáveis explicativas no modelo: enquanto o $R^2$ simples cresce (ou permanece igual) de forma artificial a cada variável adicionada, o $R^2$ ajustado só aumenta se a nova variável trouxer um ganho real de explicação, tornando-o o indicador ideal e justo para comparar modelos com diferentes quantidades de regressores.
