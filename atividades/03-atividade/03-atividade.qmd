@@ -1,0 +1,311 @@
+---
+lang: "pt-BR"
+title: "Atividade Prática 3 — Respostas"
+subtitle: "Econometria Aplicada à Finanças <br> Mestrado Profissional em Administração"
+author: "Jonathan Vargas Silva"
+title-block-banner: "#27445C"
+date: today
+date-format: long
+format:
+  html:
+    embed-resources: true
+    toc: true
+    toc-location: left
+    toc-title: "Navegação"
+    code-copy: true
+    fig-dpi: 300
+execute:
+  echo: true
+  message: false
+  warning: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Define a quantidade de algarismos exibidos nos resultados
+options(digits = 5)
+
+# Carrega o metapacote usado na atividade
+library(tidyverse)
+
+# Carrega o pacote usado para executar o teste de White
+library(whitestrap)
+```
+
+
+## Questão 1 — Simulando dados de um modelo homocedástico
+
+```{r}
+#| label: q1-simulacao-homocedastica
+
+# Fixa a semente para tornar a simulação reproduzível
+set.seed(12345)
+
+# Define o tamanho da amostra e os parâmetros populacionais
+n <- 500
+beta_0 <- 1
+beta_1 <- 3
+sigma <- 2
+
+# Gera o regressor e o termo de erro homocedástico
+x <- runif(n, min = -3, max = 3)
+erro <- rnorm(n, mean = 0, sd = sigma)
+
+# Calcula a variável dependente segundo o modelo populacional
+y <- beta_0 + beta_1 * x + erro
+
+# Organiza as variáveis simuladas
+dados_homo <- tibble(x, erro, y)
+
+# Estima o modelo por MQO
+modelo_homo <- lm(y ~ x, data = dados_homo)
+
+# Apresenta as estimativas dos coeficientes
+broom::tidy(modelo_homo)
+```
+
+**a.** Identifique os parâmetros populacionais, as variáveis aleatórias e as
+estimativas calculadas com a amostra. Diferencie `beta_1` do coeficiente de `x`
+retornado por `lm()`.
+
+Os parâmetros populacionais são \beta_0, \beta_1 e \sigma. As variáveis aleatórias são \qquad
+x_i e \varepsilon_i. As estimativas são 1,08 para \beta_0 e 3,03 para `x`. O \beta_1 é um parâmetro populacional e o coeficiente de `x`, retornado por `lm() é uma estimativa.
+
+
+**b.** Compare as estimativas com os parâmetros populacionais. Explique por que
+elas não precisam ser exatamente iguais aos parâmetros.
+
+As estimativas não precisam ser iguais aos parâmetros populacionais porque a amostra é apenas uma realização aleatória entre muitas possíveis.
+
+**c.** Execute o gráfico e explique o que representam os pontos, a reta e a
+dispersão vertical em torno dela.
+
+```{r}
+#| label: q1-grafico-homocedastico
+#| fig-cap: "Amostra simulada e reta de regressão estimada no modelo homocedástico."
+
+# Representa os dados e acrescenta a reta estimada por MQO
+ggplot(dados_homo, aes(x = x, y = y)) +
+  geom_point(color = "darkslategrey", alpha = 0.55) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "#E64173") +
+  labs(x = "x", y = "y") +
+  theme_minimal()
+```
+
+Os pontos representam os pares observados (x, y) da amostra simulada. A reta representa a relação estimada por MQO. A dispersão vertical dos pontos em torno da reta reflete a influência do erro sobre y.
+
+
+**d.** Explique por que a simulação ajuda a avaliar um procedimento
+econométrico e por que uma única amostra não demonstra uma propriedade geral do
+estimador.
+
+A simulação ajuda porque, ao contrário de dados reais, os parâmetros populacionais verdadeiros são conhecidos e é possível verificar se o MQO consegue representá-los. Entretanto, uma única amostra é apenas uma realização aleatória entre muitas possíveis.
+
+
+## Questão 2 — Simulando dados de um modelo heterocedástico
+
+**a.** Execute a simulação e examine o intervalo dos desvios-padrão.
+
+```{r}
+#| label: q2-simulacao-heterocedastica
+
+# Fixa a semente e define o modelo populacional
+set.seed(12345)
+n <- 500
+beta_0 <- 1
+beta_1 <- 3
+
+# Gera o regressor
+x <- runif(n, min = -3, max = 3)
+
+# Define um desvio-padrão que aumenta com x
+sigma_i <- 5 + 1.5 * x
+
+# Interrompe a execução se algum desvio-padrão não for positivo
+stopifnot(all(sigma_i > 0))
+
+# Gera os erros e a variável dependente
+erro <- rnorm(n, mean = 0, sd = sigma_i)
+y <- beta_0 + beta_1 * x + erro
+
+# Organiza as variáveis simuladas
+dados_hetero <- tibble(x, sigma_i, erro, y)
+
+# Verifica o intervalo dos desvios-padrão simulados
+range(dados_hetero$sigma_i)
+```
+
+Confirme que o intervalo observado é coerente com o intervalo teórico.
+
+Sim, pois o intervalo observado é 0{,}51\leq\sigma_i\leq9{,}47 e o intervalo teórico é 0{,}5\leq\sigma_i\leq9{,}5.
+
+
+**b.** Execute o gráfico dos erros verdadeiros. Explique por que o funil indica
+mudança da variância condicional, e não necessariamente da média condicional dos
+erros.
+
+```{r}
+#| label: q2-erros-verdadeiros
+#| fig-cap: "Erros verdadeiros no modelo heterocedástico simulado."
+
+# Representa os erros verdadeiros em função do regressor
+ggplot(dados_hetero, aes(x = x, y = erro)) +
+  geom_hline(yintercept = 0, linewidth = 0.4, color = "grey45") +
+  geom_point(color = "darkslategrey", alpha = 0.55) +
+  labs(x = "x", y = "Erro verdadeiro") +
+  theme_minimal()
+```
+
+O formato de funil indica mudança na variância condicional porque a dispersão vertical dos pontos em torno de zero aumenta conforme x se afasta de zero. Isso não indica mudança na média condicional, pois os pontos continuam centrados em torno de zero em todos os valores de x.
+
+
+**c.** Estime o modelo, compare as estimativas com os parâmetros populacionais e
+explique por que os erros verdadeiros não são idênticos aos resíduos.
+
+```{r}
+#| label: q2-estimacao
+
+# Estima o modelo por MQO
+modelo_hetero <- lm(y ~ x, data = dados_hetero)
+
+# Apresenta as estimativas dos coeficientes
+broom::tidy(modelo_hetero)
+
+# Acrescenta resíduos e valores ajustados à base simulada
+dados_hetero <- dados_hetero |>
+  mutate(
+    residuo = residuals(modelo_hetero),
+    ajustado = fitted(modelo_hetero)
+  )
+
+# Compara os erros e os resíduos das seis primeiras observações
+dados_hetero |>
+  select(erro, residuo) |>
+  slice_head(n = 6)
+```
+
+As estimativas ficaram próximas dos parâmetros verdadeiros, mas os erros-padrão são maiores do que no modelo, refletindo a heterocedasticidade dos erros. Já o resíduo e o erro verdadeiro não são idênticos porque o resíduo depende dos coeficientes estimados, que variam de uma amostra para outra, enquanto o erro verdadeiro depende dos parâmetros populacionais, que são fixos.
+
+**d.** Execute o gráfico `Residuals vs Fitted` e escreva uma interpretação
+clara e objetiva, com três a cinco frases.
+
+```{r}
+#| label: q2-residuos-ajustados
+#| fig-cap: "Resíduos contra valores ajustados no modelo heterocedástico."
+
+# Seleciona o gráfico Residuals vs Fitted
+plot(modelo_hetero, which = 1)
+```
+
+A posição dos resíduos em relação a zero se distancia ao longo do eixo `x`. A sua dispersão vertical não permanece aproximadamente constante e, por isso o padrão observado não é compatível com homocedasticidade, visto que o gráfico representa um formato de funil, que é um claro exemplo de heterocedasticidade.
+
+
+**e.** Explique se a heterocedasticidade, isoladamente, torna os estimadores de
+MQO viesados neste processo gerador. Use em sua justificativa a hipótese
+$E(\varepsilon_i\mid x_i)=0$.
+
+Não, a heterocedasticidade, de forma isolada, não torna os estimadores de
+MQO viesados. Visto que, a hipótese de E(\varepsilon_i\mid x_i)=0 pode ser mantida nesta simulação.
+
+
+## Questão 3 — Compreendendo o teste de White
+
+**a.** Execute a simulação e examine o gráfico `Residuals vs Fitted`. Explique
+por que o padrão é coerente com variância menor perto de $x=0$ e maior para
+valores de $x$ mais afastados de zero.
+
+```{r}
+#| label: q3-simulacao-funil-duplo
+
+# Fixa a semente e define o modelo populacional
+set.seed(12345)
+n <- 500
+beta_0 <- 1
+beta_1 <- 3
+
+# Gera o regressor e define o desvio-padrão condicional
+x <- runif(n, min = -3, max = 3)
+sigma_i <- 2 + x^2
+
+# Interrompe a execução se algum desvio-padrão não for positivo
+stopifnot(all(sigma_i > 0))
+
+# Gera os erros e calcula a variável dependente
+erro <- rnorm(n, mean = 0, sd = sigma_i)
+y <- beta_0 + beta_1 * x + erro
+
+# Organiza a amostra e estima o modelo por MQO
+dados_extremos <- tibble(x, sigma_i, erro, y)
+modelo_extremos <- lm(y ~ x, data = dados_extremos)
+
+# Acrescenta os resíduos à base
+dados_extremos <- dados_extremos |>
+  mutate(residuo = residuals(modelo_extremos))
+```
+
+```{r}
+#| label: q3-residuos-ajustados
+#| fig-cap: "Resíduos contra valores ajustados no modelo com funil duplo."
+
+# Seleciona o gráfico Residuals vs Fitted
+plot(modelo_extremos, which = 1)
+```
+
+Perto de $x=0$, os resíduos ficam concentrados perto de zero, formando uma faixa estreita. Nos dois extremos de x, a dispersão aumenta. Isso é coerente com o processo gerador porque o desvio-padrão cresce com o quadrado de x e não com seu valor absoluto. Por isso a variância aumenta nos dois extremos.
+
+
+**b.** Execute o cálculo manual do teste de White. Apresente a hipótese nula, a
+estatística, o valor-*p* e a decisão ao nível de significância de 5%.
+
+```{r}
+#| label: q3-white-manual
+
+# Estima a regressão auxiliar do teste de White
+modelo_auxiliar <- lm(
+  I(residuo^2) ~ x + I(x^2),
+  data = dados_extremos
+)
+
+# Extrai o R-quadrado da regressão auxiliar
+r2_auxiliar <- summary(modelo_auxiliar)$r.squared
+
+# Calcula a estatística LM = n R-quadrado
+estatistica_white <- nrow(dados_extremos) * r2_auxiliar
+
+# Calcula o valor-p na cauda direita da distribuição qui-quadrado
+valor_p_white <- pchisq(
+  q = estatistica_white,
+  df = 2,
+  lower.tail = FALSE
+)
+
+# Exibe a estatística do teste e o valor-p
+estatistica_white
+valor_p_white
+```
+
+A estatística do teste é 83,61 e o valor-p é aproximadamente 6,97×10⁻¹⁹. Como esse valor é muito menor que 0,05, há evidência estatística suficiente para rejeitar a hipótese nula de homocedasticidade.
+
+
+**c.** Execute a função pronta, compare a estatística e o valor-*p* com o
+cálculo manual e explique a eventual exibição de um valor-*p* igual a `0`.
+
+```{r}
+#| label: q3-white-pacote
+
+# Executa o teste de White a partir do modelo estimado
+whitestrap::white_test(modelo_extremos)
+```
+
+A concordância entre os dois procedimentos confirma que o cálculo manual foi feito corretamente. Porém, essa concordância não substitui a interpretação da hipótese, pois o teste indica apenas evidência contra a homocedasticidade, sem evidenciar a forma exata do problema. O valor-p condiz com o resultado do item anterior, apesar de estar exibido como 0 pela função. Isso não é uma probabilidade teoricamente nula, e sim uma limitação de precisão numérica do sistema, para representar números extremamente pequenos.
+
+
+**d.** Sintetize as consequências da heterocedasticidade para o viés, a
+eficiência e a inferência convencional de MQO, mantendo a hipótese de
+exogeneidade.
+
+1. Na condição de exogeneidade válida, a heterocedasticidade não altera o viés dos coeficientes estimados por MQO.
+2. Neste caso, a heterocedasticidade torna MQO ineficiente.
+3. A heterocedasticidade gera erros-padrão convencionais viesados, reduz a precisão dos testes de hipótese e também dos intervalos de confiança.
