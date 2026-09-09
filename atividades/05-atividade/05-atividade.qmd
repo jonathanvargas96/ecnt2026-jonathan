@@ -1,0 +1,242 @@
+---
+lang: "pt-BR"
+title: "Atividade Prática 5 — Respostas"
+subtitle: "Econometria Aplicada à Finanças <br> Mestrado Profissional em Administração"
+author: "Jonathan Vargas Silva"
+title-block-banner: "#27445C"
+date: today
+date-format: long
+format:
+  html:
+    embed-resources: true
+    toc: true
+    toc-location: left
+    toc-title: "Navegação"
+    code-copy: true
+    fig-dpi: 300
+execute:
+  echo: true
+  message: false
+  warning: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Define a exibição dos números
+options(digits = 5, scipen = 999)
+
+# Carrega os pacotes necessários
+library(here)
+library(tidyverse)
+library(lmtest)
+library(sandwich)
+
+# Define o caminho relativo do arquivo CSV
+caminho_csv <- here::here("data/raw/data-ps2.csv")
+
+# Importa os dados
+dados <- readr::read_csv(caminho_csv, show_col_types = FALSE)
+
+# Cria as variações mensais
+dados <- dados |>
+  mutate(
+    diff_housing = housing - lag(housing),
+    diff_mr = mortgage_rate - lag(mortgage_rate),
+    diff_industry = industry - lag(industry),
+    diff_unemp = unemp - lag(unemp)
+  )
+```
+
+# Questão 1: Autocorrelação e inferência
+
+## **a.** Estimação do modelo
+
+Estime por MQO o modelo especificado no enunciado utilizando `lm()` e armazene
+o resultado em um objeto denominado `modelo`.
+
+```{r}
+#| label: q1a-modelo
+
+# Estime o modelo
+modelo <- stats::lm(
+  diff_housing ~ diff_mr + diff_industry + diff_unemp,
+  data = dados
+)
+modelo
+```
+
+Interprete economicamente o coeficiente de `diff_mr` e classifique o modelo
+como estático ou dinâmico, justificando sua resposta.
+
+O coeficiente de `diff_mr` (-41.60) é economicamente coerente, visto que juros mais altos encarecem o financiamento imobiliário e desestimulam novas construções. O modelo é estático, porque relaciona a variação da construção residencial em determinado mês apenas com variações de outras variáveis no mesmo mês. Não há nenhuma variável defasada entre as explicativas.
+
+## **b.** Diagnóstico da autocorrelação
+
+Examine a FAC dos resíduos:
+
+```{r}
+#| label: q1b-fac
+
+# Exibe a FAC dos resíduos
+acf(residuals(modelo))
+```
+
+Com base no gráfico, avalie a presença de autocorrelação e o sinal sugerido
+nas primeiras defasagens.
+
+1. No gráfico em questão observa-se a presença de autocorrelação.
+2. O sinal da autocorrelação na primeira defasagem é negativo, visto que um resíduo acima da média em um mês tende a ser seguido por um resíduo abaixo da média no mês seguinte.
+
+Realize o teste de Breusch–Godfrey para autocorrelação de primeira ordem.
+Apresente as hipóteses, o resultado, a decisão para $\alpha=5\%$ e sua
+interpretação.
+
+**Dica:** utilize `lmtest::bgtest()` com `order = 1`.
+
+```{r}
+#| label: q1b-breusch-godfrey
+
+# Execute o teste de Breusch–Godfrey
+resultado_bg <- lmtest::bgtest(modelo, order = 1)
+resultado_bg
+```
+1. H0: não há autocorrelação de primeira ordem nos erros; H1: há autocorrelação de primeira ordem.
+2. O teste resultou em LM = 72,7 (df = 1), com p-valor extremamente pequeno (<0,0000000000000002).
+3. Como o p-valor é consideravelmente menor que 0,05, rejeitamos H0.
+4. Há forte evidência estatística de autocorrelação de primeira ordem nos erros do modelo.
+
+## **c.** Inferência com erros-padrão de Newey–West
+
+Calcule a inferência com erros-padrão de Newey–West conforme especificado no
+enunciado.
+
+Armazene:
+
+- o estimador da matriz de covariância em `vcov_nw`;
+- o resultado de `lmtest::coeftest()` em `resultado_nw`.
+
+Use `prewhite = FALSE` e `adjust = TRUE`.
+
+```{r}
+#| label: q1c-newey-west
+
+# Estime a matriz de covariância Newey-West
+vcov_nw <- sandwich::NeweyWest(
+  modelo,
+  prewhite = FALSE,
+  adjust = TRUE
+)
+
+# Calcule a inferência com Newey-West
+resultado_nw <- lmtest::coeftest(
+  modelo,
+  vcov. = vcov_nw
+)
+
+# Apresente os resultados
+resultado_nw
+```
+
+Explique por que os coeficientes permanecem os mesmos, por que os erros-padrão
+podem mudar e por que Newey–West é adequado ao problema diagnosticado.
+
+1. Os coeficientes de MQO permanecem os mesmos, porque Newey-West só corrige a matriz de covariância e não reestima os parâmetros do modelo.
+2. Os erros-padrão podem mudar, porque agora levam em conta a autocorrelação identificada no item b.
+3. Newey-West é adequado porque o problema diagnosticado foi justamente autocorrelação nos resíduos e é exatamente esse tipo de problema que esse estimador corrige.
+
+## **d.** Comparando a inferência
+
+Compare a inferência convencional de MQO com a inferência obtida utilizando
+erros-padrão de Newey–West.
+
+```{r}
+#| label: q1d-comparacao
+
+# Obtém a inferência convencional
+resultado_conv <- lmtest::coeftest(modelo)
+
+# Calcula os intervalos de confiança de 95%
+ic_conv <- lmtest::coefci(modelo)
+
+ic_nw <- lmtest::coefci(
+  modelo,
+  vcov. = vcov_nw
+)
+
+# Organiza os resultados para comparação
+comparacao <- tibble(
+  coeficiente = rownames(resultado_conv),
+  estimativa = resultado_conv[, "Estimate"],
+  ep_convencional = resultado_conv[, "Std. Error"],
+  ic95_conv_inferior = ic_conv[, 1],
+  ic95_conv_superior = ic_conv[, 2],
+  p_convencional = resultado_conv[, "Pr(>|t|)"],
+  ep_newey_west = resultado_nw[, "Std. Error"],
+  ic95_nw_inferior = ic_nw[, 1],
+  ic95_nw_superior = ic_nw[, 2],
+  p_newey_west = resultado_nw[, "Pr(>|t|)"]
+)
+
+# Formata os valores-p para apresentação
+comparacao_exibicao <- comparacao |>
+  mutate(
+    p_convencional = format.pval(
+      p_convencional,
+      digits = 3,
+      eps = 0.001
+    ),
+    p_newey_west = format.pval(
+      p_newey_west,
+      digits = 3,
+      eps = 0.001
+    )
+  )
+
+# Apresenta os resultados
+knitr::kable(
+  comparacao_exibicao,
+  digits = 3,
+  caption = paste(
+    "Comparação entre a inferência convencional (MQO)",
+    "e a inferência de Newey–West."
+  )
+)
+```
+
+Com base na comparação:
+
+1. as estimativas dos coeficientes mudaram quando utilizamos Newey–West?
+   Explique;
+   
+Não. Os coeficientes são idênticos nas duas colunas de estimativa, pois Newey-West não reestima os parâmetros, só corrige os erros-padrão.
+
+2. os erros-padrão mudaram todos na mesma direção? Identifique pelo menos um
+   coeficiente cujo erro-padrão aumentou e um cujo erro-padrão diminuiu, caso
+   isso ocorra;
+
+Não. O erro-padrão de `diff_mr` diminuiu, enquanto o de diff_industry aumentou.
+
+3. compare os intervalos de confiança convencionais com os intervalos obtidos
+   com Newey–West. Houve mudanças relevantes na incerteza associada às
+   estimativas?
+
+Sim, principalmente para `diff_mr`. O intervalo convencional é [−87,08; 3,87] e o de Newey-West é [−78,55; −4,66].
+
+4. alguma conclusão inferencial é alterada ao utilizar Newey–West,
+   considerando $\alpha=5\%$?
+   
+Sim. Para `diff_mr`, o p-valor convencional é 0,073, mas o p-valor de Newey-West é 0,027. Ou seja, ao corrigir a autocorrelação, o efeito do `diff_mr` passa a ser estatisticamente significativo.
+
+5. escolha **um coeficiente** e faça uma interpretação conjunta de:
+
+   * sua magnitude;
+   * sua incerteza;
+   * seu intervalo de confiança;
+   * sua evidência estatística.
+
+Não limite sua interpretação à comparação do valor-$p$ com o nível de
+significância.
+
+O coeficiente de diff_mr é grande em magnitude (−41,60), sugerindo um efeito economicamente relevante. Porém, o cálculo convencional de incerteza era tão amplo que o intervalo de confiança incluía o zero, impedindo rejeitar a hipótese de efeito nulo. Ao corrigir a incerteza para a autocorrelação presente nos dados (Newey-West), o intervalo ficou mais estreito e deixou de incluir o zero, e o p-valor caiu para 0,027, fornecendo evidência estatística de que a taxa de hipoteca de fato reduz as novas construções residenciais no mesmo mês, algo que a inferência convencional não conseguia confirmar..
