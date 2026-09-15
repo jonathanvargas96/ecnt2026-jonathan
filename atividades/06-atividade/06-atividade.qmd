@@ -1,0 +1,140 @@
+---
+lang: "pt-BR"
+title: "Atividade Prática 6 — Respostas"
+subtitle: "Econometria Aplicada à Finanças <br> Mestrado Profissional em Administração"
+author: "Jonathan Vargas Silva"
+title-block-banner: "#27445C"
+date: today
+date-format: long
+format:
+  html:
+    embed-resources: true
+    toc: true
+    toc-location: left
+    toc-title: "Navegação"
+    code-copy: true
+    fig-dpi: 300
+execute:
+  echo: true
+  message: false
+  warning: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Define a exibição dos números
+options(digits = 5, scipen = 999)
+
+# Carrega o pacote necessário
+library(strucchange)
+```
+
+
+## Questão 1
+
+```{r}
+#| label: dados-nilo
+
+# Carrega a série anual do fluxo do rio Nilo
+# disponível no pacote datasets.
+data("Nile", package = "datasets")
+
+# Representa a série para examinar possíveis mudanças
+# de nível ao longo do tempo.
+plot(
+  Nile,
+  type = "l",
+  xlab = "Ano",
+  ylab = expression("Fluxo anual (" * 10^8 * " m"^3 * ")"),
+  main = "Fluxo anual do rio Nilo em Assuã"
+)
+```
+
+
+```{r}
+#| label: modelo-nilo
+
+# Estima um modelo com apenas intercepto para
+# representar o nível médio da série.
+modelo_nilo <- lm(Nile ~ 1)
+```
+
+
+
+### **a)**
+
+```{r}
+#| label: q1a-ols-cusum
+
+# Calcula o processo OLS-CUSUM para avaliar a
+# estabilidade da média.
+cusum_nilo <- strucchange::efp(
+  formula(modelo_nilo),
+  type = "OLS-CUSUM"
+)
+
+# Representa o processo OLS-CUSUM com os
+# limites críticos de 5%.
+plot(cusum_nilo, alpha = 0.05)
+
+# Calcula a estatística e o valor-p do
+# teste OLS-CUSUM.
+resultado_cusum <- strucchange::sctest(cusum_nilo)
+
+# Exibe a estatística e o valor-p do teste.
+resultado_cusum
+```
+
+::: {.callout-note title="Sua resposta"}
+
+- Sim, ultrapassa, durante período aproximado de 1882 a 1925, chegando no seu pico máximo, por volta de 1898;
+
+- S0 = 2.95, p-value = 0.000000054;
+
+- Ao nível de significância de 5%, há forte evidência estatística contra a hipótese de estabilidade da média do fluxo anual do Nilo.
+:::
+
+
+
+### **b)**
+
+```{r}
+#| label: q1b-supf
+
+# Calcula as estatísticas F para as divisões candidatas da amostra,
+# utilizando trimming de 15% nas extremidades.
+estatisticas_f <- strucchange::Fstats(
+  formula(modelo_nilo),
+  from = 0.15
+)
+
+# Aplica o teste supF para uma quebra com
+# localização desconhecida.
+resultado_supf <- strucchange::sctest(
+  estatisticas_f,
+  type = "supF"
+)
+
+# Exibe a estatística e o valor-p do teste.
+resultado_supf
+
+# Localiza a divisão associada ao maior
+# valor das estatísticas F.
+quebra_nilo <- strucchange::breakpoints(estatisticas_f)
+
+# Exibe a localização estimada da quebra.
+quebra_nilo
+```
+
+::: {.callout-note title="Sua resposta"}
+
+- sup.F = 75.9, p-value = 0.00000000000000022. Portanto, conclui-se que, ao nível de significância de 5%, há evidência de uma mudança abrupta na média;
+
+- Ano associado à quebra estimada: 1898. Ou seja, em 1898 termina o primeiro regime e em 1899 começa o segundo;
+
+- A localização encontrada coincide exatamente com a construção da primeira barragem de Assuã. Essa proximidade temporal não é suficiente, por si só, para estabelecer que essa obra causou a mudança. Porém, pode-se dizer que é um forte indício;
+
+- Os resultados do  teste supF e do OLS-CUSUM são muito próximos, sendo o ano associado à quebra estimada (sup.F) o mesmo do pico máximo do nível do processo de flutuação empírica (OLS-CUSUM).
+:::
