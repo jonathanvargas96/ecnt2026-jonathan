@@ -1,0 +1,158 @@
+---
+lang: "pt-BR"
+title: "Análise Crítica da Aplicação Econométrica"
+subtitle: "Silva (2024) — Modelo de regressão linear múltipla para previsão de overbreak em escavações subterrâneas de desenvolvimento (UFOP)"
+author: "Jonathan Vargas Silva"
+format: html
+editor: visual
+---
+
+## Introdução
+
+Este relatório organiza os resultados reportados por Silva (2024) e verifica a lógica de alguns dos testes de hipótese e escolhas de modelagem apresentados, com o objetivo de sustentar com evidência própria a análise crítica da Avaliação 2.
+
+Este trabalho não disponibiliza os dados brutos das 84 observações (dados reais e sigilosos de uma mina de ouro). Por isso, o que segue não é uma réplica da regressão adotada, mas sim a organização e a verificação lógica dos números que o próprio trabalho já reporta.
+
+## 1. Dados reportados no trabalho
+
+```{r}
+library(tidyverse)
+
+estatisticas_descritivas <- tribble(
+  ~variavel, ~media, ~mediana, ~minimo, ~maximo, ~q1, ~q3,
+  "OB (%)",  24.0,   22.1,     2.4,     84.4,    12.4, 30.3,
+  "PL (m)",  4.8,    5.0,      3.8,     6.8,     5.0,  5.0,
+  "CE (kg)", 480.0,  513.0,    225.0,   845.0,   380.0, 558.0,
+  "CM (kg)", 82.9,   86.6,     36.2,    150.0,   72.8, 93.8,
+  "DD (m)",  331.0,  176.0,    10.3,    923.0,   74.6, 647.0,
+  "DS (m)",  66.0,   38.5,     0.5,     193.0,   14.6, 94.0,
+  "Q",       15.5,   13.3,     5.3,     47.5,    9.9,  18.5
+)
+estatisticas_descritivas
+```
+
+```{r}
+contagem_tp <- tribble(
+  ~tipo_escavacao,       ~n,
+  "GALERIA DE PESQUISA", 10,
+  "ORE DRIVE",           24,
+  "RAMPA",               37,
+  "TRAVESSA",            13
+)
+
+contagem_ex <- tribble(
+  ~tipo_explosivo,          ~n,
+  "ANFO",                    8,
+  "ANFO/ENCARTUCHADO",       8,
+  "EMULSÃO",                40,
+  "EMULSÃO/ENCARTUCHADO",   25,
+  "ENCARTUCHADO",            3
+)
+
+contagem_tp
+contagem_ex
+```
+
+## 2. Resultados reportados pelos autores
+
+```{r}
+coeficientes <- tribble(
+  ~preditor,                    ~estimativa,
+  "Intercepto",                  19.87,
+  "PL",                           3.57,
+  "CE",                           0.09,
+  "CM",                          -0.55,
+  "DD",                          -0.01,
+  "DS",                           0.01,
+  "Q",                           -0.12,
+  "TP: ORE DRIVE - GALERIA",     16.34,
+  "TP: RAMPA - GALERIA",         -7.12,
+  "TP: TRAVESSA - GALERIA",      -5.15,
+  "EX: ANFO/ENCART - ANFO",     -13.21,
+  "EX: EMULSÃO - ANFO",          -9.22,
+  "EX: EMULSÃO/ENCART - ANFO",   -5.93,
+  "EX: ENCARTUCHADO - ANFO",    -13.66
+)
+coeficientes
+```
+
+- Teste F global: R² = 0,296; F = 2,27; gl1 = 13; gl2 = 70; p = 0,015
+- Durbin-Watson: estatística = 1,75; p = 0,070
+- VIF: máximo de 2,50 (variável CM); todos abaixo de 5
+- Shapiro-Wilk (normalidade dos resíduos): W = 0,978; p = 0,167
+
+## 3. Verificação da lógica do teste de Durbin-Watson — sustentando a crítica 1
+
+```{r}
+alpha <- 0.05
+p_dw <- 0.070
+
+decisao <- if (p_dw < alpha) "Rejeita H0" else "Não rejeita H0"
+decisao
+```
+
+*A regra de decisão padrão é rejeitar H0 apenas quando p \< alpha. Com p = 0,070 \> 0,05, a decisão correta é **não rejeitar H0**. O texto do trabalho, porém, afirma o contrário: "a hipótese nula H0 é rejeitada e a hipótese alternativa H1 é aceita". A conclusão final sobre não haver autocorrelação até coincide com o que se esperaria (H0 do teste DW costuma ser "não há autocorrelação"), mas o caminho lógico descrito está invertido. Um erro de interpretação do teste de hipótese, e não uma questão de opinião.*
+
+## 4. Fragilidade das estimativas: subcategorias pequenas e influência não investigada — sustentando a crítica 2
+
+```{r}
+contagens <- bind_rows(
+  contagem_tp |> rename(categoria = tipo_escavacao),
+  contagem_ex |> rename(categoria = tipo_explosivo)
+)
+contagens
+```
+
+Regra prática de triagem da Aula 8 para alta alavancagem: h_ii \> 2(k + 1)/n. Para o modelo do trabalho, k = 13 (o gl1 do teste F) e n = 84.
+
+```{r}
+n_total <- 84
+k_preditores <- 13
+
+limite_h <- 2 * (k_preditores + 1) / n_total
+limite_h
+```
+
+Como a dummy de cada categoria está no modelo, cada observação de uma categoria com m casos tem alavancagem de pelo menos 1/m. Comparando com o limite de triagem:
+
+```{r}
+contagens |>
+  mutate(
+    h_minimo = 1 / n,
+    atinge_limite = round(h_minimo, 4) >= round(limite_h, 4)
+  ) |>
+  arrange(n)
+```
+
+*Com base nessa análise, podemos observar dois pontos:*
+
+*(a) Subcategorias pequenas: os 3 desmontes com explosivo ENCARTUCHADO têm alavancagem mínima de 1/3 ≈ 0,33, igual ao limite de triagem (0,33). O coeficiente dessa categoria (−13,66) depende de apenas 3 observações. Além disso, 3 observações não cobrem os 4 tipos de escavação, então pelo menos uma das combinações ENCARTUCHADO × tipo de escavação, entre as 20 equações finais, é extrapolação. Lembrar que é uma regra de triagem, não um teste formal.*
+
+*(b) Influência não investigada: o trabalho identifica outliers por boxplot em OB, PL, CE, CM e Q e decide não removê-los, porque não havia erro de registro. Porém, não apresenta alavancagem, DFBETAS/DFFITS nem compara o modelo com e sem esses casos. Como visto na Aula 8, um valor incomum não é necessariamente influente: influência é o quanto os coeficientes mudam quando a observação sai. Sem os dados brutos, não dá para afirmar que as estimativas são instáveis, apenas que a estabilidade não foi demonstrada.*
+
+## 5. R² baixo e variável omitida
+
+*Os próprios autores reconhecem que o modelo explica apenas 29,6% da variabilidade do overbreak e citam uma variável omitida (desvio da perfuração linear) que não foi incluída. Isso conecta diretamente com o conceito de viés de variável omitida estudado na Atividade 2. Mesmo quando reconhecido pelos próprios autores, um R² baixo é um sinal de que fatores relevantes continuam fora do modelo.*
+
+## 6. Falta de termo de interação entre TP e EX
+
+*O modelo (Equação 5) inclui TP e EX apenas de forma aditiva (cada um soma um efeito fixo, independente do outro). Porém, o próprio trabalho apresenta 20 equações diferentes, uma para cada combinação possível de TP e EX. O que sugere que, na prática, o efeito do tipo de explosivo pode depender do tipo de escavação. Isso é exatamente o que um termo de interação (TP*EX) capturaria de forma mais direta e testável estatisticamente, em vez de simplesmente somar os coeficientes de cada dummy separadamente.\*
+
+## 7. Pontos positivos a reconhecer
+
+*(i) o cálculo e a interpretação do VIF (todos os valores abaixo de 5, portanto sem indício de multicolinearidade problemática) e do teste de Shapiro-Wilk (p = 0,167, não há evidência para rejeitar a normalidade dos resíduos) foram feitos corretamente e de forma clara;*
+
+*(ii) o trabalho não removeu os outliers sem evidência de erro de registro, o que está de acordo com a orientação da Aula 8 (verificar erros e entender o contexto antes de excluir). O passo seguinte, avaliar a sensibilidade das conclusões a esses casos, é o que faltou (item 4).*
+
+## 8. Síntese da análise crítica
+
+*Em resumo, pode-se concluir que o trabalho analisado, apesar da interessante premissa, tem uma notória fragilidade estatística, que compromete, de certa forma, os resultados obtidos. Alguns pontos destacados são:*
+
+1.  *Erro de interpretação do teste de Durbin-Watson (item 3).*
+2.  *Estimativas frágeis: subcategorias minúsculas (ENCARTUCHADO com n = 3, alavancagem mínima no limite de triagem) e influência dos outliers não investigada (item 4).*
+3.  *R² baixo e variável omitida já reconhecida pelos próprios autores (item 5).*
+4.  *Ausência de termo de interação entre TP e EX, apesar do próprio desenho do trabalho sugerir essa necessidade (item 6).*
+
+*Entretanto, é importante reconher os seus pontos positivos (item 7): o VIF e o teste de Shapiro-Wilk foram bem calculados e bem interpretados, e os outliers não foram removidos sem evidência de erro.*
+
+*Como sugestão, uma extensão possível para a evolução do trabalho seria a aplicação de uma regressão robusta (lmrob) para checar se os coeficientes se mantêm, e uma regressão quantílica para os overbreaks altos, já que a distribuição do OB tem cauda à direita (média 24,0 acima da mediana 22,1; máximo 84,4 contra 3º quartil 30,3) e o interesse operacional está em evitar os casos extremos.*

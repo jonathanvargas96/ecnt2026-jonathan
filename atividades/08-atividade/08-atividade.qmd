@@ -1,0 +1,40 @@
+---
+lang: "pt-BR"
+title: "Atividade 8 - Econometria Aplicada à Finanças"
+author: "Jonathan Vargas Silva"
+format:
+  html:
+    toc: true
+    embed-resources: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# Questões
+
+Considere que um analista ou pesquisador estima, por MQO, uma regressão para relacionar o retorno excedente de uma ação ao retorno excedente do mercado, ou seja, que estime o CAPM.
+
+Após examinar os resultados, surgem três perguntas:
+
+
+## 1. Alguns meses específicos alteram substantivamente o beta estimado ou os valores ajustados da regressão?
+
+Diagnósticos de influência: medem quanto o beta (DFBETAS) e os valores ajustados (DFFITS) mudam quando cada mês é excluído da amostra. Permitem identificar meses que merecem investigação (erro de registro, contexto econômico) e avaliar se as conclusões dependem deles. Não autorizam, por si só, excluir a observação.
+
+
+## 2. A relação estimada por MQO é excessivamente sensível a determinadas observações?
+
+Regressão robusta: reestima os coeficientes por um método menos sensível a observações incomuns, dando peso menor a elas. Os pesos mostram quais meses pesaram menos. Comparando com o MQO, permite concluir se a relação depende de poucas observações extremas (coeficientes mudam muito) ou se se mantém (coeficientes parecidos).
+
+
+## 3. A associação entre o retorno da ação e o retorno do mercado é a mesma nos diferentes quantis condicionais do retorno da ação?
+
+Regressão quantílica: estima a relação entre o retorno da ação e o do mercado em diferentes quantis condicionais do retorno da ação (por exemplo: 10%, 50% e 90%), e não só na média, como o MQO. Se as inclinações forem parecidas entre os quantis, a associação é semelhante ao longo da distribuição. Se forem diferentes, a sensibilidade ao mercado muda entre retornos baixos, medianos e altos da ação.
+
+
+## Conclusão
+
+As ferramentas não são substitutas porque solucionam questões diferentes: os diagnósticos identificam quais observações influenciam o resultado, a regressão robusta reduz essa influência na estimação e a regressão quantílica verifica se a relação muda ao longo da distribuição do retorno da ação. São complementares porque, juntas, mostram quais casos pesam, se a conclusão resiste a eles e se a relação é a mesma em todos os quantis.
