@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jonathan Vargas Silva">
+
+<title>Análise crítica de uma aplicação de regressão linear múltipla</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="avaliacao-02_files/libs/clipboard/clipboard.min.js"></script>
+<script src="avaliacao-02_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="avaliacao-02_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="avaliacao-02_files/libs/quarto-html/popper.min.js"></script>
+<script src="avaliacao-02_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="avaliacao-02_files/libs/quarto-html/anchor.min.js"></script>
+<link href="avaliacao-02_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="avaliacao-02_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="avaliacao-02_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="avaliacao-02_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="avaliacao-02_files/libs/bootstrap/bootstrap-215b371544c282197b31c8aa00ce3677.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Índice</h2>
+   
+  <ul>
+  <li><a href="#introdução" id="toc-introdução" class="nav-link active" data-scroll-target="#introdução">Introdução</a></li>
+  <li><a href="#problema-e-motivação" id="toc-problema-e-motivação" class="nav-link" data-scroll-target="#problema-e-motivação">1. Problema e motivação</a>
+  <ul class="collapse">
+  <li><a href="#problema-investigado" id="toc-problema-investigado" class="nav-link" data-scroll-target="#problema-investigado">1.1 Problema investigado</a></li>
+  <li><a href="#por-que-o-problema-é-relevante" id="toc-por-que-o-problema-é-relevante" class="nav-link" data-scroll-target="#por-que-o-problema-é-relevante">1.2 Por que o problema é relevante</a></li>
+  </ul></li>
+  <li><a href="#trabalho-selecionado" id="toc-trabalho-selecionado" class="nav-link" data-scroll-target="#trabalho-selecionado">2. Trabalho selecionado</a>
+  <ul class="collapse">
+  <li><a href="#identificação-e-objetivo" id="toc-identificação-e-objetivo" class="nav-link" data-scroll-target="#identificação-e-objetivo">2.1 Identificação e objetivo</a></li>
+  <li><a href="#contexto-da-pesquisa" id="toc-contexto-da-pesquisa" class="nav-link" data-scroll-target="#contexto-da-pesquisa">2.2 Contexto da pesquisa</a></li>
+  </ul></li>
+  <li><a href="#dados-e-aplicação-econométrica" id="toc-dados-e-aplicação-econométrica" class="nav-link" data-scroll-target="#dados-e-aplicação-econométrica">3. Dados e aplicação econométrica</a>
+  <ul class="collapse">
+  <li><a href="#variável-dependente-e-variáveis-explicativas" id="toc-variável-dependente-e-variáveis-explicativas" class="nav-link" data-scroll-target="#variável-dependente-e-variáveis-explicativas">3.1 Variável dependente e variáveis explicativas</a></li>
+  <li><a href="#estatística-descritiva-reportada" id="toc-estatística-descritiva-reportada" class="nav-link" data-scroll-target="#estatística-descritiva-reportada">3.2 Estatística descritiva reportada</a></li>
+  <li><a href="#especificação-do-modelo" id="toc-especificação-do-modelo" class="nav-link" data-scroll-target="#especificação-do-modelo">3.3 Especificação do modelo</a></li>
+  <li><a href="#qual-é-o-papel-da-regressão-no-trabalho" id="toc-qual-é-o-papel-da-regressão-no-trabalho" class="nav-link" data-scroll-target="#qual-é-o-papel-da-regressão-no-trabalho">3.4 Qual é o papel da regressão no trabalho?</a></li>
+  </ul></li>
+  <li><a href="#principais-resultados" id="toc-principais-resultados" class="nav-link" data-scroll-target="#principais-resultados">4. Principais resultados</a>
+  <ul class="collapse">
+  <li><a href="#coeficientes-estimados" id="toc-coeficientes-estimados" class="nav-link" data-scroll-target="#coeficientes-estimados">4.1 Coeficientes estimados</a></li>
+  <li><a href="#significância-global-do-modelo" id="toc-significância-global-do-modelo" class="nav-link" data-scroll-target="#significância-global-do-modelo">4.2 Significância global do modelo</a></li>
+  <li><a href="#diagnósticos-reportados-no-trabalho" id="toc-diagnósticos-reportados-no-trabalho" class="nav-link" data-scroll-target="#diagnósticos-reportados-no-trabalho">4.3 Diagnósticos reportados no trabalho</a></li>
+  </ul></li>
+  <li><a href="#análise-crítica-da-aplicação-econométrica" id="toc-análise-crítica-da-aplicação-econométrica" class="nav-link" data-scroll-target="#análise-crítica-da-aplicação-econométrica">5. Análise crítica da aplicação econométrica</a>
+  <ul class="collapse">
+  <li><a href="#o-que-as-evidências-permitem-afirmar" id="toc-o-que-as-evidências-permitem-afirmar" class="nav-link" data-scroll-target="#o-que-as-evidências-permitem-afirmar">5.1 O que as evidências permitem afirmar?</a></li>
+  <li><a href="#erro-na-regra-de-decisão-do-teste-de-durbin-watson" id="toc-erro-na-regra-de-decisão-do-teste-de-durbin-watson" class="nav-link" data-scroll-target="#erro-na-regra-de-decisão-do-teste-de-durbin-watson">5.2 Erro na regra de decisão do teste de Durbin-Watson</a></li>
+  <li><a href="#questão-anterior-à-própria-decisão-do-durbin-watson-a-adequação-do-teste-ao-desenho-dos-dados" id="toc-questão-anterior-à-própria-decisão-do-durbin-watson-a-adequação-do-teste-ao-desenho-dos-dados" class="nav-link" data-scroll-target="#questão-anterior-à-própria-decisão-do-durbin-watson-a-adequação-do-teste-ao-desenho-dos-dados">5.3 Questão anterior à própria decisão do Durbin-Watson: a adequação do teste ao desenho dos dados</a></li>
+  <li><a href="#heterocedasticidade-não-é-investigada" id="toc-heterocedasticidade-não-é-investigada" class="nav-link" data-scroll-target="#heterocedasticidade-não-é-investigada">5.4 Heterocedasticidade não é investigada</a></li>
+  <li><a href="#categoria-com-apenas-três-observações" id="toc-categoria-com-apenas-três-observações" class="nav-link" data-scroll-target="#categoria-com-apenas-três-observações">5.5 Categoria com apenas três observações</a></li>
+  <li><a href="#triagem-de-possível-alavancagem" id="toc-triagem-de-possível-alavancagem" class="nav-link" data-scroll-target="#triagem-de-possível-alavancagem">5.6 Triagem de possível alavancagem</a></li>
+  <li><a href="#ausência-de-interação-entre-tipo-de-escavação-e-tipo-de-explosivo" id="toc-ausência-de-interação-entre-tipo-de-escavação-e-tipo-de-explosivo" class="nav-link" data-scroll-target="#ausência-de-interação-entre-tipo-de-escavação-e-tipo-de-explosivo">5.7 Ausência de interação entre tipo de escavação e tipo de explosivo</a></li>
+  <li><a href="#outliers-decisão-defensável-mas-análise-de-influência-incompleta" id="toc-outliers-decisão-defensável-mas-análise-de-influência-incompleta" class="nav-link" data-scroll-target="#outliers-decisão-defensável-mas-análise-de-influência-incompleta">5.8 Outliers: decisão defensável, mas análise de influência incompleta</a></li>
+  <li><a href="#r²-de-296-e-variável-omitida" id="toc-r²-de-296-e-variável-omitida" class="nav-link" data-scroll-target="#r²-de-296-e-variável-omitida">5.9 R² de 29,6% e variável omitida</a></li>
+  <li><a href="#tamanho-da-amostra-e-quantidade-de-parâmetros" id="toc-tamanho-da-amostra-e-quantidade-de-parâmetros" class="nav-link" data-scroll-target="#tamanho-da-amostra-e-quantidade-de-parâmetros">5.10 Tamanho da amostra e quantidade de parâmetros</a></li>
+  <li><a href="#o-que-o-trabalho-faz-bem" id="toc-o-que-o-trabalho-faz-bem" class="nav-link" data-scroll-target="#o-que-o-trabalho-faz-bem">5.11 O que o trabalho faz bem</a></li>
+  </ul></li>
+  <li><a href="#síntese-da-análise-crítica" id="toc-síntese-da-análise-crítica" class="nav-link" data-scroll-target="#síntese-da-análise-crítica">6. Síntese da análise crítica</a></li>
+  <li><a href="#conclusão" id="toc-conclusão" class="nav-link" data-scroll-target="#conclusão">7. Conclusão</a></li>
+  <li><a href="#referência-principal" id="toc-referência-principal" class="nav-link" data-scroll-target="#referência-principal">Referência principal</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Análise crítica de uma aplicação de regressão linear múltipla</h1>
+<p class="subtitle lead">Avaliação 2 — Exame Intermediário de Econometria Aplicada às Finanças</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autor</div>
+    <div class="quarto-title-meta-contents">
+             <p>Jonathan Vargas Silva </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introdução" class="level1">
+<h1>Introdução</h1>
+<p>Este relatório apresenta uma análise crítica da aplicação de regressão linear múltipla desenvolvida por Silva (2024) para previsão de <em>overbreak</em> em escavações subterrâneas de desenvolvimento. O trabalho foi escolhido por tratar de um problema diretamente relacionado à mineração e, ao mesmo tempo, utilizar uma técnica econométrica compatível com o conteúdo da disciplina.</p>
+<p>O propósito desta análise não é reproduzir o estudo original, mas compreender a aplicação realizada, interpretar seus principais resultados e verificar, à luz dos conceitos trabalhados em Econometria, quais conclusões são efetivamente sustentadas pelos dados e pelo modelo apresentado pelo autor. Como os dados brutos de 84 desmontes não são disponibilizados no trabalho, a análise utiliza exclusivamente as informações, estatísticas e resultados reportados por Silva (2024).</p>
+</section>
+<section id="problema-e-motivação" class="level1">
+<h1>1. Problema e motivação</h1>
+<section id="problema-investigado" class="level2">
+<h2 class="anchored" data-anchor-id="problema-investigado">1.1 Problema investigado</h2>
+<p>O <em>overbreak</em> corresponde à escavação de rocha além do perfil planejado. Em escavações subterrâneas realizadas por perfuração e desmonte com explosivos, esse fenômeno pode aumentar custos de desenvolvimento, ampliar a necessidade de contenção e suporte e afetar prazos e segurança operacional.</p>
+<p>O trabalho de Silva (2024) procura investigar, em uma mina subterrânea de ouro localizada no Quadrilátero Ferrífero, em que medida características do maciço rochoso e parâmetros operacionais de perfuração e desmonte estão associados ao percentual de <em>overbreak</em>. O objetivo geral declarado pelo autor é desenvolver, por regressão linear múltipla, um modelo capaz de predizer o valor do <em>overbreak</em>.</p>
+</section>
+<section id="por-que-o-problema-é-relevante" class="level2">
+<h2 class="anchored" data-anchor-id="por-que-o-problema-é-relevante">1.2 Por que o problema é relevante</h2>
+<p>O tema possui relevância operacional porque o <em>overbreak</em> representa uma consequência indesejada do processo de escavação. Um modelo que identifique associações entre variáveis controláveis, por exemplo, parâmetros de perfuração e explosivos, e o <em>overbreak</em> pode contribuir para o planejamento e o acompanhamento da operação.</p>
+<p>A escolha deste trabalho também é coerente com minha atuação profissional no setor mineral, permitindo analisar uma aplicação econométrica em um contexto concreto de mineração, em vez de tratar a regressão apenas de forma abstrata.</p>
+</section>
+</section>
+<section id="trabalho-selecionado" class="level1">
+<h1>2. Trabalho selecionado</h1>
+<section id="identificação-e-objetivo" class="level2">
+<h2 class="anchored" data-anchor-id="identificação-e-objetivo">2.1 Identificação e objetivo</h2>
+<p><strong>SILVA, Davi Arantes. <em>Modelo de regressão linear múltipla para previsão de overbreak em escavações subterrâneas de desenvolvimento</em>. Ouro Preto: Universidade Federal de Ouro Preto, 2024.</strong></p>
+<p>O trabalho é um Trabalho de Conclusão de Curso apresentado ao Departamento de Engenharia de Minas da UFOP. Seu objetivo geral é desenvolver um modelo de regressão linear múltipla para predizer o <em>overbreak</em> em escavações subterrâneas de desenvolvimento, considerando a qualidade do maciço rochoso e parâmetros operacionais de perfuração e desmonte por explosivos.</p>
+<p>Os objetivos específicos são: quantificar a influência das variáveis escolhidas sobre o <em>overbreak</em>; realizar estatística descritiva das variáveis; e definir um modelo de regressão múltipla para predição do fenômeno.</p>
+</section>
+<section id="contexto-da-pesquisa" class="level2">
+<h2 class="anchored" data-anchor-id="contexto-da-pesquisa">2.2 Contexto da pesquisa</h2>
+<p>A base de dados é composta por <strong>84 desmontes</strong> realizados em frentes de desenvolvimento subterrâneo, distribuídos em diferentes pontos da mina estudada. O trabalho descreve a unidade de observação como cada desmonte realizado.</p>
+<p>O período de coleta dos dados não é informado explicitamente na metodologia. O estudo informa apenas que foram considerados 84 desmontes distribuídos em vários pontos da mina.</p>
+</section>
+</section>
+<section id="dados-e-aplicação-econométrica" class="level1">
+<h1>3. Dados e aplicação econométrica</h1>
+<section id="variável-dependente-e-variáveis-explicativas" class="level2">
+<h2 class="anchored" data-anchor-id="variável-dependente-e-variáveis-explicativas">3.1 Variável dependente e variáveis explicativas</h2>
+<p>A variável dependente é o <strong>overbreak (OB)</strong>, medido em percentual.</p>
+<p>As variáveis quantitativas explicativas são:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Variável</th>
+<th>Descrição</th>
+<th style="text-align: right;">Unidade</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PL</td>
+<td>Perfuração linear</td>
+<td style="text-align: right;">m</td>
+</tr>
+<tr class="even">
+<td>CE</td>
+<td>Carga total de explosivo</td>
+<td style="text-align: right;">kg</td>
+</tr>
+<tr class="odd">
+<td>CM</td>
+<td>Carga máxima por espera</td>
+<td style="text-align: right;">kg</td>
+</tr>
+<tr class="even">
+<td>DD</td>
+<td>Distância ao dique máfico</td>
+<td style="text-align: right;">m</td>
+</tr>
+<tr class="odd">
+<td>DS</td>
+<td>Distância a falhas singulares</td>
+<td style="text-align: right;">m</td>
+</tr>
+<tr class="even">
+<td>Q</td>
+<td>Índice Q de Barton</td>
+<td style="text-align: right;">—</td>
+</tr>
+</tbody>
+</table>
+<p>Além delas, são utilizados dois fatores qualitativos:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Fator</th>
+<th>Categorias</th>
+<th>Referência</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>TP — tipo de escavação</td>
+<td>Galeria de pesquisa, Ore Drive, Rampa, Travessa</td>
+<td>Galeria de pesquisa</td>
+</tr>
+<tr class="even">
+<td>EX — tipo de explosivo</td>
+<td>ANFO, ANFO/Encartuchado, Emulsão, Emulsão/Encartuchado, Encartuchado</td>
+<td>ANFO</td>
+</tr>
+</tbody>
+</table>
+<p>As categorias são incorporadas à regressão por meio de variáveis <em>dummy</em>. Para TP são utilizadas três dummies, mantendo “Galeria de pesquisa” como categoria de referência. Para EX são utilizadas quatro dummies, mantendo “ANFO” como referência.</p>
+</section>
+<section id="estatística-descritiva-reportada" class="level2">
+<h2 class="anchored" data-anchor-id="estatística-descritiva-reportada">3.2 Estatística descritiva reportada</h2>
+<p>A amostra possui 84 observações. A tabela abaixo reproduz os principais valores reportados pelo autor.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Mostrar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>estatisticas_descritivas <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>variavel, <span class="sc">~</span>media, <span class="sc">~</span>mediana, <span class="sc">~</span>minimo, <span class="sc">~</span>maximo, <span class="sc">~</span>q1, <span class="sc">~</span>q3,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"OB (%)"</span>,  <span class="fl">24.0</span>,   <span class="fl">22.1</span>,     <span class="fl">2.35</span>,     <span class="fl">84.4</span>,    <span class="fl">12.4</span>, <span class="fl">30.3</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"PL (m)"</span>,   <span class="fl">4.8</span>,    <span class="fl">5.0</span>,     <span class="fl">3.8</span>,      <span class="fl">6.8</span>,     <span class="fl">5.0</span>,  <span class="fl">5.0</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"CE (kg)"</span>, <span class="fl">480.0</span>,  <span class="fl">513.0</span>,   <span class="fl">225.0</span>,    <span class="fl">845.0</span>,   <span class="fl">380.0</span>, <span class="fl">558.0</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"CM (kg)"</span>,  <span class="fl">82.9</span>,   <span class="fl">86.6</span>,    <span class="fl">36.2</span>,    <span class="fl">150.0</span>,    <span class="fl">72.8</span>,  <span class="fl">93.8</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"DD (m)"</span>,   <span class="fl">331.0</span>,  <span class="fl">176.0</span>,    <span class="fl">10.3</span>,    <span class="fl">923.0</span>,    <span class="fl">74.6</span>, <span class="fl">647.0</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"DS (m)"</span>,    <span class="fl">66.0</span>,   <span class="fl">38.5</span>,     <span class="fl">0.5</span>,    <span class="fl">193.0</span>,    <span class="fl">14.6</span>,  <span class="fl">94.0</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Q"</span>,         <span class="fl">15.5</span>,   <span class="fl">13.3</span>,     <span class="fl">5.3</span>,     <span class="fl">47.5</span>,     <span class="fl">9.9</span>,  <span class="fl">18.5</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>estatisticas_descritivas</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 7
+  variavel media mediana minimo maximo    q1    q3
+  &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 OB (%)    24      22.1   2.35   84.4  12.4  30.3
+2 PL (m)     4.8     5     3.8     6.8   5     5  
+3 CE (kg)  480     513   225     845   380   558  
+4 CM (kg)   82.9    86.6  36.2   150    72.8  93.8
+5 DD (m)   331     176    10.3   923    74.6 647  
+6 DS (m)    66      38.5   0.5   193    14.6  94  
+7 Q         15.5    13.3   5.3    47.5   9.9  18.5</code></pre>
+</div>
+</div>
+<p>O <em>overbreak</em> médio é de 24,0%, enquanto a mediana é 22,1%. O máximo observado é 84,4%, muito acima do terceiro quartil, de 30,3%, o que confirma a presença de observações elevadas que merecem atenção na análise de robustez.</p>
+<p>Entre as categorias qualitativas, os 84 desmontes estão distribuídos da seguinte forma:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Mostrar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>contagem_tp <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>tipo_escavacao, <span class="sc">~</span>n,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Galeria de pesquisa"</span>, <span class="dv">10</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Ore Drive"</span>, <span class="dv">24</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Rampa"</span>, <span class="dv">37</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Travessa"</span>, <span class="dv">13</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>contagem_ex <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>tipo_explosivo, <span class="sc">~</span>n,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ANFO"</span>, <span class="dv">8</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ANFO/Encartuchado"</span>, <span class="dv">8</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Emulsão"</span>, <span class="dv">40</span>,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Emulsão/Encartuchado"</span>, <span class="dv">25</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Encartuchado"</span>, <span class="dv">3</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>contagem_tp</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 2
+  tipo_escavacao          n
+  &lt;chr&gt;               &lt;dbl&gt;
+1 Galeria de pesquisa    10
+2 Ore Drive              24
+3 Rampa                  37
+4 Travessa               13</code></pre>
+</div>
+<details class="code-fold">
+<summary>Mostrar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>contagem_ex</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  tipo_explosivo           n
+  &lt;chr&gt;                &lt;dbl&gt;
+1 ANFO                     8
+2 ANFO/Encartuchado        8
+3 Emulsão                 40
+4 Emulsão/Encartuchado    25
+5 Encartuchado             3</code></pre>
+</div>
+</div>
+<p>Um ponto importante é a forte desigualdade no número de observações entre algumas categorias. A categoria “Encartuchado”, por exemplo, possui apenas <strong>3 observações</strong>, enquanto “Emulsão” possui 40.</p>
+</section>
+<section id="especificação-do-modelo" class="level2">
+<h2 class="anchored" data-anchor-id="especificação-do-modelo">3.3 Especificação do modelo</h2>
+<p>O trabalho estima um modelo de regressão linear múltipla com variáveis quantitativas e fatores qualitativos representados por dummies. Em forma conceitual, a especificação pode ser escrita como:</p>
+<p><span class="math display">\[
+OB_i = \beta_0 + \beta_1PL_i + \beta_2CE_i + \beta_3CM_i + \beta_4DD_i + \beta_5DS_i + \beta_6Q_i + \text{dummies de TP}_i + \text{dummies de EX}_i + \varepsilon_i.
+\]</span></p>
+<p>A interpretação dos coeficientes quantitativos é condicional às demais variáveis do modelo. Por exemplo, o coeficiente de PL representa a variação associada ao <em>overbreak</em> para um aumento de um metro na perfuração linear, mantendo constantes os demais regressores.</p>
+<p>Para as dummies, os coeficientes representam diferenças em relação à categoria de referência, também mantendo constantes as demais variáveis.</p>
+</section>
+<section id="qual-é-o-papel-da-regressão-no-trabalho" class="level2">
+<h2 class="anchored" data-anchor-id="qual-é-o-papel-da-regressão-no-trabalho">3.4 Qual é o papel da regressão no trabalho?</h2>
+<p>A regressão é utilizada para duas finalidades relacionadas. Primeiro, estima associações entre os parâmetros operacionais/geológicos e o <em>overbreak</em>. Segundo, combina os coeficientes estimados em equações de previsão para diferentes combinações das categorias de escavação e explosivo.</p>
+<p>É importante observar que o trabalho apresenta <strong>20 equações possíveis</strong>, correspondentes às combinações entre as quatro categorias de TP e as cinco categorias de EX. Essas 20 equações não correspondem a 20 regressões estimadas separadamente: elas são combinações dos efeitos estimados no mesmo modelo, dadas as categorias de referência e os demais coeficientes.</p>
+</section>
+</section>
+<section id="principais-resultados" class="level1">
+<h1>4. Principais resultados</h1>
+<section id="coeficientes-estimados" class="level2">
+<h2 class="anchored" data-anchor-id="coeficientes-estimados">4.1 Coeficientes estimados</h2>
+<p>Os coeficientes reportados pelo autor são:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Mostrar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>coeficientes <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>preditor, <span class="sc">~</span>estimativa,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Intercepto"</span>, <span class="fl">19.87</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"PL"</span>, <span class="fl">3.57</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"CE"</span>, <span class="fl">0.09</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"CM"</span>, <span class="sc">-</span><span class="fl">0.55</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"DD"</span>, <span class="sc">-</span><span class="fl">0.01</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"DS"</span>, <span class="fl">0.01</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Q"</span>, <span class="sc">-</span><span class="fl">0.12</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"TP: Ore Drive − Galeria de pesquisa"</span>, <span class="fl">16.34</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"TP: Rampa − Galeria de pesquisa"</span>, <span class="sc">-</span><span class="fl">7.13</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"TP: Travessa − Galeria de pesquisa"</span>, <span class="sc">-</span><span class="fl">5.15</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"EX: ANFO/Encartuchado − ANFO"</span>, <span class="sc">-</span><span class="fl">13.21</span>,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"EX: Emulsão − ANFO"</span>, <span class="sc">-</span><span class="fl">9.22</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"EX: Emulsão/Encartuchado − ANFO"</span>, <span class="sc">-</span><span class="fl">5.93</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"EX: Encartuchado − ANFO"</span>, <span class="sc">-</span><span class="fl">13.67</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>coeficientes</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 14 × 2
+   preditor                            estimativa
+   &lt;chr&gt;                                    &lt;dbl&gt;
+ 1 Intercepto                               19.9 
+ 2 PL                                        3.57
+ 3 CE                                        0.09
+ 4 CM                                       -0.55
+ 5 DD                                       -0.01
+ 6 DS                                        0.01
+ 7 Q                                        -0.12
+ 8 TP: Ore Drive − Galeria de pesquisa      16.3 
+ 9 TP: Rampa − Galeria de pesquisa          -7.13
+10 TP: Travessa − Galeria de pesquisa       -5.15
+11 EX: ANFO/Encartuchado − ANFO            -13.2 
+12 EX: Emulsão − ANFO                       -9.22
+13 EX: Emulsão/Encartuchado − ANFO          -5.93
+14 EX: Encartuchado − ANFO                 -13.7 </code></pre>
+</div>
+</div>
+<p>Os sinais dos coeficientes permitem uma interpretação substantiva dos resultados reportados. Na amostra estudada, PL apresenta coeficiente de 3,57: um aumento de um metro na perfuração linear está associado a um aumento de 3,57 pontos percentuais no <em>overbreak</em>, condicionando-se às demais variáveis do modelo.</p>
+<p>CM apresenta coeficiente de −0,55, enquanto DD apresenta −0,01, DS apresenta 0,01 e Q apresenta −0,12. Esses valores descrevem a associação condicional estimada pelo modelo; eles não devem ser interpretados automaticamente como efeitos causais.</p>
+<p>Nas variáveis categóricas, a categoria “Ore Drive” está associada a um <em>overbreak</em> estimado 16,34 pontos percentuais acima da categoria de referência “Galeria de pesquisa”, mantidas constantes as demais variáveis. As categorias de TP “Rampa” e “Travessa” apresentam coeficientes negativos em relação à mesma referência.</p>
+<p>Para EX, todas as categorias apresentam coeficientes negativos em relação ao ANFO. O maior valor em magnitude é o da categoria “Encartuchado”, −13,66.</p>
+<p>Como o quadro apresentado na monografia, na forma consultada, não é utilizado aqui para estabelecer uma lista de significância estatística individual dos coeficientes, a análise enfatiza seus sinais e magnitudes e utiliza o teste F para a significância conjunta do modelo.</p>
+</section>
+<section id="significância-global-do-modelo" class="level2">
+<h2 class="anchored" data-anchor-id="significância-global-do-modelo">4.2 Significância global do modelo</h2>
+<p>O trabalho reporta estatística F = 2,27, com 13 graus de liberdade no numerador e 70 no denominador, p = 0,015 e R² = 0,296. Como verificação interna, o p-valor também pode ser recalculado a partir da estatística F e dos graus de liberdade informados:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Mostrar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>estatistica_F <span class="ot">&lt;-</span> <span class="fl">2.27</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>gl1 <span class="ot">&lt;-</span> <span class="dv">13</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>gl2 <span class="ot">&lt;-</span> <span class="dv">70</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>p_valor_calculado <span class="ot">&lt;-</span> <span class="fu">pf</span>(estatistica_F, gl1, gl2, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>r2 <span class="ot">&lt;-</span> <span class="fl">0.296</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>resultados_F <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Estatistica =</span> estatistica_F,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">gl1 =</span> gl1,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">gl2 =</span> gl2,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">p-valor calculado</span><span class="st">`</span> <span class="ot">=</span> p_valor_calculado,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">R²</span><span class="st">`</span> <span class="ot">=</span> r2</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>resultados_F</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 5
+  Estatistica   gl1   gl2 `p-valor calculado`  `R²`
+        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;               &lt;dbl&gt; &lt;dbl&gt;
+1        2.27    13    70              0.0147 0.296</code></pre>
+</div>
+</div>
+<p>Usando os valores arredondados reportados na monografia, o cálculo resulta em p ≈ 0,0147, valor consistente com o p = 0,015 apresentado pelo autor. Portanto, rejeita-se a hipótese nula de que, conjuntamente, os coeficientes das variáveis explicativas sejam iguais a zero. Há evidência estatística de associação entre o conjunto de regressores e o <em>overbreak</em>.</p>
+<p>O R² de 0,296 indica que 29,6% da variabilidade observada do <em>overbreak</em> é explicada pela especificação estimada. Isso mostra que o modelo contém informação relevante, mas também que uma parcela majoritária da variabilidade permanece fora da explicação do modelo.</p>
+<p>O R², por si só, não determina se o modelo é “bom” ou “ruim” e tampouco mede diretamente a capacidade de previsão fora da amostra. Isso é particularmente importante porque o objetivo declarado do estudo é <strong>predizer</strong> o <em>overbreak</em>. A monografia apresenta o ajuste do modelo e suas equações, mas não reporta uma separação entre amostra de estimação e amostra de teste, erro de previsão fora da amostra ou outro procedimento de validação preditiva. Assim, o trabalho demonstra ajuste dentro da amostra, mas não permite avaliar diretamente como o modelo se comportaria ao prever novos desmontes.</p>
+</section>
+<section id="diagnósticos-reportados-no-trabalho" class="level2">
+<h2 class="anchored" data-anchor-id="diagnósticos-reportados-no-trabalho">4.3 Diagnósticos reportados no trabalho</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Mostrar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>diagnosticos <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>Diagnostico, <span class="sc">~</span>Estatistica, <span class="sc">~</span>p_valor, <span class="sc">~</span>Leitura,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Durbin-Watson"</span>, <span class="fl">1.75</span>, <span class="fl">0.070</span>, <span class="st">"p &gt; 0,05; não há evidência suficiente para rejeitar H0"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Shapiro-Wilk"</span>, <span class="fl">0.978</span>, <span class="fl">0.167</span>, <span class="st">"p &gt; 0,05; não rejeitar H0 de normalidade"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"VIF máximo"</span>, <span class="fl">2.50</span>, <span class="cn">NA</span>, <span class="st">"Abaixo do limiar de triagem de 5 utilizado no trabalho"</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>diagnosticos</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 4
+  Diagnostico   Estatistica p_valor Leitura                                     
+  &lt;chr&gt;               &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;                                       
+1 Durbin-Watson       1.75    0.07  p &gt; 0,05; não há evidência suficiente para …
+2 Shapiro-Wilk        0.978   0.167 p &gt; 0,05; não rejeitar H0 de normalidade    
+3 VIF máximo          2.5    NA     Abaixo do limiar de triagem de 5 utilizado …</code></pre>
+</div>
+</div>
+<p>O maior VIF reportado é 2,50, na variável CM, não indicando um problema elevado de multicolinearidade segundo o critério utilizado no próprio trabalho.</p>
+<p>O teste de Shapiro-Wilk apresenta W = 0,978 e p = 0,167. Não se rejeita a hipótese nula de normalidade ao nível de 5%. Isso é compatível com a conclusão apresentada pelo autor.</p>
+</section>
+</section>
+<section id="análise-crítica-da-aplicação-econométrica" class="level1">
+<h1>5. Análise crítica da aplicação econométrica</h1>
+<section id="o-que-as-evidências-permitem-afirmar" class="level2">
+<h2 class="anchored" data-anchor-id="o-que-as-evidências-permitem-afirmar">5.1 O que as evidências permitem afirmar?</h2>
+<p>A principal cautela interpretativa é diferenciar <strong>associação estatística</strong> de <strong>causalidade</strong>. O fato de um coeficiente ser positivo ou negativo no modelo significa que a variável está associada ao <em>overbreak</em>, condicionalmente às demais variáveis incluídas. O desenho apresentado no trabalho não estabelece, por si só, que alterações exógenas em uma variável produzirão causalmente uma mudança no <em>overbreak</em>.</p>
+<p>Essa distinção é especialmente importante quando o próprio trabalho utiliza expressões como “causas” e “influência”. Os resultados permitem identificar relações condicionais estimadas pelo modelo; uma interpretação causal exigiria pressupostos e estratégias adicionais de identificação.</p>
+</section>
+<section id="erro-na-regra-de-decisão-do-teste-de-durbin-watson" class="level2">
+<h2 class="anchored" data-anchor-id="erro-na-regra-de-decisão-do-teste-de-durbin-watson">5.2 Erro na regra de decisão do teste de Durbin-Watson</h2>
+<p>Este é o problema mais claramente demonstrado no texto da monografia.</p>
+<p>O trabalho reporta estatística DW = 1,75 e p = 0,070. Em seguida afirma que, como p &gt; 0,05, a hipótese nula é rejeitada e a alternativa é aceita. Essa regra está invertida.</p>
+<p>Adotando a regra geral de decisão utilizada na própria análise estatística do trabalho, quando p &gt; α <strong>não se rejeita H0</strong>. Portanto, a formulação correta é:</p>
+<blockquote class="blockquote">
+<p>com p = 0,070 &gt; 0,05, não há evidência suficiente para rejeitar a hipótese nula do teste.</p>
+</blockquote>
+<p>A conclusão substantiva de ausência de evidência de autocorrelação de primeira ordem é compatível com essa decisão, mas a justificativa textual apresentada no trabalho está incorreta.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Mostrar código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>p_dw <span class="ot">&lt;-</span> <span class="fl">0.070</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (p_dw <span class="sc">&lt;</span> alpha) {</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Rejeitar H0"</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Não rejeitar H0"</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Não rejeitar H0"</code></pre>
+</div>
+</div>
+</section>
+<section id="questão-anterior-à-própria-decisão-do-durbin-watson-a-adequação-do-teste-ao-desenho-dos-dados" class="level2">
+<h2 class="anchored" data-anchor-id="questão-anterior-à-própria-decisão-do-durbin-watson-a-adequação-do-teste-ao-desenho-dos-dados">5.3 Questão anterior à própria decisão do Durbin-Watson: a adequação do teste ao desenho dos dados</h2>
+<p>Há uma questão metodológica mais profunda.</p>
+<p>O trabalho descreve a amostra como 84 desmontes distribuídos em vários pontos da mina e não apresenta uma série temporal nem uma ordenação temporal das observações. Entretanto, o Durbin-Watson foi utilizado para avaliar autocorrelação de primeira ordem.</p>
+<p>O teste de Durbin-Watson é especialmente associado à correlação serial em observações ordenadas. Em um conjunto de dados de corte transversal, sem uma ordem temporal ou espacial claramente definida, a pertinência do teste precisa ser justificada. Como a monografia não apresenta essa justificativa nem informa uma ordenação das observações, o resultado do Durbin-Watson deve ser interpretado com cautela.</p>
+<p>Portanto, a crítica não é apenas que a regra de decisão foi descrita de forma invertida: <strong>a própria necessidade e adequação do teste ao desenho dos dados não é suficientemente demonstrada no trabalho</strong>.</p>
+</section>
+<section id="heterocedasticidade-não-é-investigada" class="level2">
+<h2 class="anchored" data-anchor-id="heterocedasticidade-não-é-investigada">5.4 Heterocedasticidade não é investigada</h2>
+<p>Entre os diagnósticos apresentados estão Durbin-Watson, VIF e Shapiro-Wilk, mas não é reportado um diagnóstico específico para verificar se a variância dos erros é constante.</p>
+<p>Essa ausência é relevante porque o <em>overbreak</em> apresenta ampla dispersão: a média é 24,0%, o máximo é 84,4% e existem outliers identificados em algumas variáveis. Em um contexto assim, seria pertinente ao menos discutir a possibilidade de heterocedasticidade.</p>
+<p>Sem essa verificação, não é possível saber, a partir do trabalho, se os erros-padrão utilizados para as inferências são adequados sob a hipótese de variância constante.</p>
+<p>Essa é uma <strong>limitação da documentação da aplicação</strong>, e não permite afirmar que o modelo efetivamente sofre de heterocedasticidade.</p>
+</section>
+<section id="categoria-com-apenas-três-observações" class="level2">
+<h2 class="anchored" data-anchor-id="categoria-com-apenas-três-observações">5.5 Categoria com apenas três observações</h2>
+<p>A categoria “Encartuchado” possui somente três observações, enquanto outras categorias possuem dezenas. Isso merece atenção porque os respectivos efeitos são estimados com suporte empírico muito menor.</p>
+<p>Há, ainda, quatro tipos de escavação e cinco tipos de explosivo. Com apenas três observações na categoria “Encartuchado”, necessariamente existe pelo menos uma combinação entre tipo de escavação e esse tipo de explosivo que não foi observada na amostra.</p>
+<p>Isso não significa que o modelo seja matematicamente inválido. A especificação com efeitos principais consegue gerar previsões para combinações não observadas porque estima separadamente os efeitos de TP e EX. O problema é substantivo: sem uma interação TP × EX, o modelo pressupõe que o efeito de um explosivo é o mesmo, em termos aditivos, independentemente do tipo de escavação.</p>
+<p>Assim, a pequena quantidade de observações em algumas categorias reduz a força empírica para avaliar diferenças entre esses cenários.</p>
+</section>
+<section id="triagem-de-possível-alavancagem" class="level2">
+<h2 class="anchored" data-anchor-id="triagem-de-possível-alavancagem">5.6 Triagem de possível alavancagem</h2>
+<p>Uma forma adicional de fazer uma <strong>triagem de possível alavancagem</strong> seria comparar os valores de leverage individuais com uma regra de bolso, como <span class="math inline">\(2p/n\)</span>, em que <span class="math inline">\(p\)</span> representa o número de parâmetros estimados, incluindo o intercepto. Neste modelo, há 13 regressores (incluindo as dummies) e mais o intercepto, totalizando 14 parâmetros. Uma regra de bolso de <span class="math inline">\(2p/n\)</span> resulta em <span class="math inline">\(2(14)/84 \approx 0,333\)</span>. Esse valor deve ser entendido apenas como <strong>limite de alerta</strong>, não como a alavancagem observada de qualquer desmonte. Para calcular o leverage <span class="math inline">\(h_{ii}\)</span> de cada observação seriam necessários os dados originais e a matriz de desenho do modelo. Portanto, a categoria “Encartuchado”, com apenas três observações, merece investigação adicional, mas não se pode concluir, a partir da monografia, que essas três observações apresentem alta alavancagem.</p>
+</section>
+<section id="ausência-de-interação-entre-tipo-de-escavação-e-tipo-de-explosivo" class="level2">
+<h2 class="anchored" data-anchor-id="ausência-de-interação-entre-tipo-de-escavação-e-tipo-de-explosivo">5.7 Ausência de interação entre tipo de escavação e tipo de explosivo</h2>
+<p>O trabalho apresenta 20 equações resultantes das combinações entre TP e EX, mas o modelo estimado utiliza apenas os efeitos principais das duas variáveis categóricas.</p>
+<p>Uma extensão natural seria testar um termo de interação <strong>TP × EX</strong>. Esse termo permitiria verificar se a associação entre determinado explosivo e <em>overbreak</em> depende do tipo de escavação.</p>
+<p>Essa possibilidade é particularmente relevante porque a interpretação operacional do explosivo pode plausivelmente variar conforme a geometria e as características da frente. Contudo, a existência de uma interação não pode ser presumida: ela deveria ser testada empiricamente.</p>
+<p>Portanto, trata-se de uma <strong>possível melhoria de especificação</strong>, e não de um erro que invalide automaticamente o modelo original.</p>
+</section>
+<section id="outliers-decisão-defensável-mas-análise-de-influência-incompleta" class="level2">
+<h2 class="anchored" data-anchor-id="outliers-decisão-defensável-mas-análise-de-influência-incompleta">5.8 Outliers: decisão defensável, mas análise de influência incompleta</h2>
+<p>O autor identifica outliers em OB, PL, CE, CM e Q por meio de boxplots e decide mantê-los porque não foram encontrados erros de medição ou registro.</p>
+<p>Essa decisão é defensável: uma observação atípica não deve ser eliminada automaticamente apenas por ser extrema.</p>
+<p>O ponto que permanece em aberto é a <strong>influência</strong> dessas observações sobre os coeficientes. A análise poderia ser aprofundada com algum diagnóstico de influência, caso os dados estivessem disponíveis. Sem os dados brutos, não é possível concluir que os outliers efetivamente distorcem as estimativas; é possível apenas dizer que sua influência não foi demonstrada no trabalho.</p>
+</section>
+<section id="r²-de-296-e-variável-omitida" class="level2">
+<h2 class="anchored" data-anchor-id="r²-de-296-e-variável-omitida">5.9 R² de 29,6% e variável omitida</h2>
+<p>O próprio autor reconhece que as variáveis incluídas explicam 29,6% da variabilidade do <em>overbreak</em> e aponta o desvio da perfuração linear como uma variável potencialmente relevante que não foi incorporada.</p>
+<p>Esse reconhecimento é importante. Entretanto, a simples omissão de uma variável relevante não implica automaticamente viés dos coeficientes. Para haver viés por variável omitida, é necessário, entre outras condições, que a variável omitida esteja relacionada a uma ou mais variáveis incluídas no modelo.</p>
+<p>Assim, a formulação mais precisa é que a especificação pode estar sujeita a <strong>viés por variável omitida</strong> caso fatores relevantes e correlacionados com os regressores observados tenham sido deixados de fora.</p>
+<p>Além disso, o R² relativamente modesto indica que o modelo deixa grande parcela da variabilidade sem explicação. Isso limita a interpretação do modelo como uma representação completa do fenômeno, ainda que o teste F indique significância conjunta.</p>
+</section>
+<section id="tamanho-da-amostra-e-quantidade-de-parâmetros" class="level2">
+<h2 class="anchored" data-anchor-id="tamanho-da-amostra-e-quantidade-de-parâmetros">5.10 Tamanho da amostra e quantidade de parâmetros</h2>
+<p>A análise utiliza 84 observações e estima 14 parâmetros no modelo, considerando os 13 regressores e o intercepto, restando 70 graus de liberdade residuais.</p>
+<p>Isso não torna a regressão automaticamente inadequada, mas deixa uma amostra que não é muito folgada em relação ao número de parâmetros, reforçando a necessidade de cautela quanto à estabilidade dos coeficientes e à capacidade de generalização do modelo para novos desmontes.</p>
+</section>
+<section id="o-que-o-trabalho-faz-bem" class="level2">
+<h2 class="anchored" data-anchor-id="o-que-o-trabalho-faz-bem">5.11 O que o trabalho faz bem</h2>
+<p>A análise crítica também deve reconhecer escolhas adequadas.</p>
+<p>O trabalho faz uma descrição clara das variáveis, explicita as categorias de referência, utiliza dummies de forma coerente, reporta o teste de significância global, apresenta o VIF e o teste de Shapiro-Wilk e documenta a presença de outliers antes de decidir não removê-los.</p>
+<p>O uso do teste F também é coerente com o objetivo de avaliar a significância conjunta da especificação. Com p aproximadamente igual a 0,015, há evidência de que o conjunto de variáveis incluídas possui associação estatisticamente detectável com o <em>overbreak</em> na amostra analisada.</p>
+</section>
+</section>
+<section id="síntese-da-análise-crítica" class="level1">
+<h1>6. Síntese da análise crítica</h1>
+<p>A aplicação de regressão linear múltipla de Silva (2024) é coerente com o problema investigado e produz uma relação estatisticamente significativa entre o conjunto dos regressores e o <em>overbreak</em>. O modelo apresenta R² de 29,6%, VIF máximo de 2,50 e resíduos compatíveis com a normalidade segundo o teste de Shapiro-Wilk reportado.</p>
+<p>A análise crítica, entretanto, identifica alguns limites importantes para a interpretação dos resultados:</p>
+<ol type="1">
+<li><strong>Erro na regra de decisão do Durbin-Watson:</strong> com p = 0,070, a decisão correta é não rejeitar H0, e não rejeitá-la.</li>
+<li><strong>Adequação do Durbin-Watson não demonstrada:</strong> a base é descrita como um conjunto de desmontes distribuídos em vários pontos da mina, sem uma ordenação temporal explicitada.</li>
+<li><strong>Heterocedasticidade não investigada:</strong> não é apresentado diagnóstico específico da constância da variância dos resíduos.</li>
+<li><strong>Categorias muito pequenas:</strong> “Encartuchado” possui apenas três observações.</li>
+<li><strong>Alavancagem não avaliada:</strong> a frequência muito baixa de uma categoria justifica uma verificação específica de leverage, mas não permite concluir alta alavancagem sem os dados originais.</li>
+<li><strong>Ausência de interação TP × EX:</strong> o modelo assume efeitos aditivos entre tipo de escavação e explosivo, embora as combinações entre esses fatores sejam relevantes para o problema operacional.</li>
+<li><strong>Influência dos outliers não demonstrada:</strong> a decisão de mantê-los é defensável, mas não há avaliação formal de sua influência sobre os coeficientes.</li>
+<li><strong>Capacidade explicativa limitada:</strong> R² = 29,6% indica que parcela importante da variabilidade do <em>overbreak</em> permanece fora do modelo.</li>
+<li><strong>Validação preditiva incompleta:</strong> o estudo é apresentado como um modelo de previsão, mas não mostra desempenho fora da amostra.</li>
+<li><strong>Interpretação causal limitada:</strong> os resultados sustentam associações condicionais, não uma demonstração causal.</li>
+</ol>
+<p>Ao mesmo tempo, essas limitações não anulam o valor do estudo. O modelo constitui uma aplicação concreta de regressão múltipla a um problema real de mineração e oferece evidências iniciais sobre quais características operacionais e geológicas estão associadas ao <em>overbreak</em>.</p>
+</section>
+<section id="conclusão" class="level1">
+<h1>7. Conclusão</h1>
+<p>A principal contribuição da aplicação analisada está em mostrar como uma regressão linear múltipla pode ser utilizada para transformar dados operacionais de mineração em informação quantitativa para apoio à análise do <em>overbreak</em>.</p>
+<p>Os resultados indicam associação estatisticamente significativa entre o conjunto de variáveis explicativas e o <em>overbreak</em>, mas a capacidade explicativa é parcial. Portanto, o modelo deve ser entendido como uma ferramenta inicial de análise e previsão dentro do contexto específico estudado, e não como uma explicação completa ou causal do fenômeno.</p>
+<p>Do ponto de vista econométrico, a análise mostra que uma regressão não deve ser avaliada apenas pelo fato de possuir um R² ou um teste F significativo. É necessário verificar a coerência entre problema, dados e especificação, interpretar corretamente os testes de hipótese e avaliar se os pressupostos e limitações do modelo permitem sustentar as conclusões apresentadas.</p>
+<p>Para trabalhos futuros, as melhorias mais diretamente relacionadas aos resultados observados seriam: ampliar a base de dados; investigar a heterocedasticidade; avaliar a influência das observações extremas; e testar, caso haja suporte empírico suficiente, uma especificação com interação entre tipo de escavação e tipo de explosivo.</p>
+</section>
+<section id="referência-principal" class="level1">
+<h1>Referência principal</h1>
+<p>SILVA, Davi Arantes. <strong>Modelo de regressão linear múltipla para previsão de overbreak em escavações subterrâneas de desenvolvimento</strong>. 2024. Trabalho de Conclusão de Curso (Graduação em Engenharia de Minas) — Escola de Minas, Universidade Federal de Ouro Preto, Ouro Preto, 2024.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiada");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiada");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

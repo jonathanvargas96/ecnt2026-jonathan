@@ -1,158 +1,370 @@
 ---
 lang: "pt-BR"
-title: "Análise Crítica da Aplicação Econométrica"
-subtitle: "Silva (2024) — Modelo de regressão linear múltipla para previsão de overbreak em escavações subterrâneas de desenvolvimento (UFOP)"
+title: "Análise crítica de uma aplicação de regressão linear múltipla"
+subtitle: "Avaliação 2 — Exame Intermediário de Econometria Aplicada às Finanças"
 author: "Jonathan Vargas Silva"
-format: html
+format:
+  html:
+    toc: true
+    code-fold: true
+    code-summary: "Mostrar código"
 editor: visual
 ---
 
-## Introdução
+```{r}
+#| label: setup
+#| include: false
 
-Este relatório organiza os resultados reportados por Silva (2024) e verifica a lógica de alguns dos testes de hipótese e escolhas de modelagem apresentados, com o objetivo de sustentar com evidência própria a análise crítica da Avaliação 2.
+options(digits = 5, scipen = 999)
+library(tidyverse)
+```
 
-Este trabalho não disponibiliza os dados brutos das 84 observações (dados reais e sigilosos de uma mina de ouro). Por isso, o que segue não é uma réplica da regressão adotada, mas sim a organização e a verificação lógica dos números que o próprio trabalho já reporta.
+# Introdução
 
-## 1. Dados reportados no trabalho
+Este relatório apresenta uma análise crítica da aplicação de regressão linear múltipla desenvolvida por Silva (2024) para previsão de *overbreak* em escavações subterrâneas de desenvolvimento. O trabalho foi escolhido por tratar de um problema diretamente relacionado à mineração e, ao mesmo tempo, utilizar uma técnica econométrica compatível com o conteúdo da disciplina.
+
+O propósito desta análise não é reproduzir o estudo original, mas compreender a aplicação realizada, interpretar seus principais resultados e verificar, à luz dos conceitos trabalhados em Econometria, quais conclusões são efetivamente sustentadas pelos dados e pelo modelo apresentado pelo autor. Como os dados brutos de 84 desmontes não são disponibilizados no trabalho, a análise utiliza exclusivamente as informações, estatísticas e resultados reportados por Silva (2024).
+
+# 1. Problema e motivação
+
+## 1.1 Problema investigado
+
+O *overbreak* corresponde à escavação de rocha além do perfil planejado. Em escavações subterrâneas realizadas por perfuração e desmonte com explosivos, esse fenômeno pode aumentar custos de desenvolvimento, ampliar a necessidade de contenção e suporte e afetar prazos e segurança operacional.
+
+O trabalho de Silva (2024) procura investigar, em uma mina subterrânea de ouro localizada no Quadrilátero Ferrífero, em que medida características do maciço rochoso e parâmetros operacionais de perfuração e desmonte estão associados ao percentual de *overbreak*. O objetivo geral declarado pelo autor é desenvolver, por regressão linear múltipla, um modelo capaz de predizer o valor do *overbreak*.
+
+## 1.2 Por que o problema é relevante
+
+O tema possui relevância operacional porque o *overbreak* representa uma consequência indesejada do processo de escavação. Um modelo que identifique associações entre variáveis controláveis, por exemplo, parâmetros de perfuração e explosivos, e o *overbreak* pode contribuir para o planejamento e o acompanhamento da operação.
+
+A escolha deste trabalho também é coerente com minha atuação profissional no setor mineral, permitindo analisar uma aplicação econométrica em um contexto concreto de mineração, em vez de tratar a regressão apenas de forma abstrata.
+
+# 2. Trabalho selecionado
+
+## 2.1 Identificação e objetivo
+
+**SILVA, Davi Arantes. *Modelo de regressão linear múltipla para previsão de overbreak em escavações subterrâneas de desenvolvimento*. Ouro Preto: Universidade Federal de Ouro Preto, 2024.**
+
+O trabalho é um Trabalho de Conclusão de Curso apresentado ao Departamento de Engenharia de Minas da UFOP. Seu objetivo geral é desenvolver um modelo de regressão linear múltipla para predizer o *overbreak* em escavações subterrâneas de desenvolvimento, considerando a qualidade do maciço rochoso e parâmetros operacionais de perfuração e desmonte por explosivos.
+
+Os objetivos específicos são: quantificar a influência das variáveis escolhidas sobre o *overbreak*; realizar estatística descritiva das variáveis; e definir um modelo de regressão múltipla para predição do fenômeno.
+
+## 2.2 Contexto da pesquisa
+
+A base de dados é composta por **84 desmontes** realizados em frentes de desenvolvimento subterrâneo, distribuídos em diferentes pontos da mina estudada. O trabalho descreve a unidade de observação como cada desmonte realizado.
+
+O período de coleta dos dados não é informado explicitamente na metodologia. O estudo informa apenas que foram considerados 84 desmontes distribuídos em vários pontos da mina.
+
+# 3. Dados e aplicação econométrica
+
+## 3.1 Variável dependente e variáveis explicativas
+
+A variável dependente é o **overbreak (OB)**, medido em percentual.
+
+As variáveis quantitativas explicativas são:
+
+| Variável | Descrição                     | Unidade |
+|----------|-------------------------------|--------:|
+| PL       | Perfuração linear             |       m |
+| CE       | Carga total de explosivo      |      kg |
+| CM       | Carga máxima por espera       |      kg |
+| DD       | Distância ao dique máfico     |       m |
+| DS       | Distância a falhas singulares |       m |
+| Q        | Índice Q de Barton            |       — |
+
+Além delas, são utilizados dois fatores qualitativos:
+
+| Fator | Categorias | Referência |
+|----|----|----|
+| TP — tipo de escavação | Galeria de pesquisa, Ore Drive, Rampa, Travessa | Galeria de pesquisa |
+| EX — tipo de explosivo | ANFO, ANFO/Encartuchado, Emulsão, Emulsão/Encartuchado, Encartuchado | ANFO |
+
+As categorias são incorporadas à regressão por meio de variáveis *dummy*. Para TP são utilizadas três dummies, mantendo “Galeria de pesquisa” como categoria de referência. Para EX são utilizadas quatro dummies, mantendo “ANFO” como referência.
+
+## 3.2 Estatística descritiva reportada
+
+A amostra possui 84 observações. A tabela abaixo reproduz os principais valores reportados pelo autor.
 
 ```{r}
-library(tidyverse)
-
 estatisticas_descritivas <- tribble(
   ~variavel, ~media, ~mediana, ~minimo, ~maximo, ~q1, ~q3,
-  "OB (%)",  24.0,   22.1,     2.4,     84.4,    12.4, 30.3,
-  "PL (m)",  4.8,    5.0,      3.8,     6.8,     5.0,  5.0,
-  "CE (kg)", 480.0,  513.0,    225.0,   845.0,   380.0, 558.0,
-  "CM (kg)", 82.9,   86.6,     36.2,    150.0,   72.8, 93.8,
-  "DD (m)",  331.0,  176.0,    10.3,    923.0,   74.6, 647.0,
-  "DS (m)",  66.0,   38.5,     0.5,     193.0,   14.6, 94.0,
-  "Q",       15.5,   13.3,     5.3,     47.5,    9.9,  18.5
+  "OB (%)",  24.0,   22.1,     2.35,     84.4,    12.4, 30.3,
+  "PL (m)",   4.8,    5.0,     3.8,      6.8,     5.0,  5.0,
+  "CE (kg)", 480.0,  513.0,   225.0,    845.0,   380.0, 558.0,
+  "CM (kg)",  82.9,   86.6,    36.2,    150.0,    72.8,  93.8,
+  "DD (m)",   331.0,  176.0,    10.3,    923.0,    74.6, 647.0,
+  "DS (m)",    66.0,   38.5,     0.5,    193.0,    14.6,  94.0,
+  "Q",         15.5,   13.3,     5.3,     47.5,     9.9,  18.5
 )
+
 estatisticas_descritivas
 ```
 
+O *overbreak* médio é de 24,0%, enquanto a mediana é 22,1%. O máximo observado é 84,4%, muito acima do terceiro quartil, de 30,3%, o que confirma a presença de observações elevadas que merecem atenção na análise de robustez.
+
+Entre as categorias qualitativas, os 84 desmontes estão distribuídos da seguinte forma:
+
 ```{r}
 contagem_tp <- tribble(
-  ~tipo_escavacao,       ~n,
-  "GALERIA DE PESQUISA", 10,
-  "ORE DRIVE",           24,
-  "RAMPA",               37,
-  "TRAVESSA",            13
+  ~tipo_escavacao, ~n,
+  "Galeria de pesquisa", 10,
+  "Ore Drive", 24,
+  "Rampa", 37,
+  "Travessa", 13
 )
 
 contagem_ex <- tribble(
-  ~tipo_explosivo,          ~n,
-  "ANFO",                    8,
-  "ANFO/ENCARTUCHADO",       8,
-  "EMULSÃO",                40,
-  "EMULSÃO/ENCARTUCHADO",   25,
-  "ENCARTUCHADO",            3
+  ~tipo_explosivo, ~n,
+  "ANFO", 8,
+  "ANFO/Encartuchado", 8,
+  "Emulsão", 40,
+  "Emulsão/Encartuchado", 25,
+  "Encartuchado", 3
 )
 
 contagem_tp
 contagem_ex
 ```
 
-## 2. Resultados reportados pelos autores
+Um ponto importante é a forte desigualdade no número de observações entre algumas categorias. A categoria “Encartuchado”, por exemplo, possui apenas **3 observações**, enquanto “Emulsão” possui 40.
+
+## 3.3 Especificação do modelo
+
+O trabalho estima um modelo de regressão linear múltipla com variáveis quantitativas e fatores qualitativos representados por dummies. Em forma conceitual, a especificação pode ser escrita como:
+
+$$
+OB_i = \beta_0 + \beta_1PL_i + \beta_2CE_i + \beta_3CM_i + \beta_4DD_i + \beta_5DS_i + \beta_6Q_i + \text{dummies de TP}_i + \text{dummies de EX}_i + \varepsilon_i.
+$$
+
+A interpretação dos coeficientes quantitativos é condicional às demais variáveis do modelo. Por exemplo, o coeficiente de PL representa a variação associada ao *overbreak* para um aumento de um metro na perfuração linear, mantendo constantes os demais regressores.
+
+Para as dummies, os coeficientes representam diferenças em relação à categoria de referência, também mantendo constantes as demais variáveis.
+
+## 3.4 Qual é o papel da regressão no trabalho?
+
+A regressão é utilizada para duas finalidades relacionadas. Primeiro, estima associações entre os parâmetros operacionais/geológicos e o *overbreak*. Segundo, combina os coeficientes estimados em equações de previsão para diferentes combinações das categorias de escavação e explosivo.
+
+É importante observar que o trabalho apresenta **20 equações possíveis**, correspondentes às combinações entre as quatro categorias de TP e as cinco categorias de EX. Essas 20 equações não correspondem a 20 regressões estimadas separadamente: elas são combinações dos efeitos estimados no mesmo modelo, dadas as categorias de referência e os demais coeficientes.
+
+# 4. Principais resultados
+
+## 4.1 Coeficientes estimados
+
+Os coeficientes reportados pelo autor são:
 
 ```{r}
 coeficientes <- tribble(
-  ~preditor,                    ~estimativa,
-  "Intercepto",                  19.87,
-  "PL",                           3.57,
-  "CE",                           0.09,
-  "CM",                          -0.55,
-  "DD",                          -0.01,
-  "DS",                           0.01,
-  "Q",                           -0.12,
-  "TP: ORE DRIVE - GALERIA",     16.34,
-  "TP: RAMPA - GALERIA",         -7.12,
-  "TP: TRAVESSA - GALERIA",      -5.15,
-  "EX: ANFO/ENCART - ANFO",     -13.21,
-  "EX: EMULSÃO - ANFO",          -9.22,
-  "EX: EMULSÃO/ENCART - ANFO",   -5.93,
-  "EX: ENCARTUCHADO - ANFO",    -13.66
+  ~preditor, ~estimativa,
+  "Intercepto", 19.87,
+  "PL", 3.57,
+  "CE", 0.09,
+  "CM", -0.55,
+  "DD", -0.01,
+  "DS", 0.01,
+  "Q", -0.12,
+  "TP: Ore Drive − Galeria de pesquisa", 16.34,
+  "TP: Rampa − Galeria de pesquisa", -7.13,
+  "TP: Travessa − Galeria de pesquisa", -5.15,
+  "EX: ANFO/Encartuchado − ANFO", -13.21,
+  "EX: Emulsão − ANFO", -9.22,
+  "EX: Emulsão/Encartuchado − ANFO", -5.93,
+  "EX: Encartuchado − ANFO", -13.67
 )
+
 coeficientes
 ```
 
-- Teste F global: R² = 0,296; F = 2,27; gl1 = 13; gl2 = 70; p = 0,015
-- Durbin-Watson: estatística = 1,75; p = 0,070
-- VIF: máximo de 2,50 (variável CM); todos abaixo de 5
-- Shapiro-Wilk (normalidade dos resíduos): W = 0,978; p = 0,167
+Os sinais dos coeficientes permitem uma interpretação substantiva dos resultados reportados. Na amostra estudada, PL apresenta coeficiente de 3,57: um aumento de um metro na perfuração linear está associado a um aumento de 3,57 pontos percentuais no *overbreak*, condicionando-se às demais variáveis do modelo.
 
-## 3. Verificação da lógica do teste de Durbin-Watson — sustentando a crítica 1
+CM apresenta coeficiente de −0,55, enquanto DD apresenta −0,01, DS apresenta 0,01 e Q apresenta −0,12. Esses valores descrevem a associação condicional estimada pelo modelo; eles não devem ser interpretados automaticamente como efeitos causais.
+
+Nas variáveis categóricas, a categoria “Ore Drive” está associada a um *overbreak* estimado 16,34 pontos percentuais acima da categoria de referência “Galeria de pesquisa”, mantidas constantes as demais variáveis. As categorias de TP “Rampa” e “Travessa” apresentam coeficientes negativos em relação à mesma referência.
+
+Para EX, todas as categorias apresentam coeficientes negativos em relação ao ANFO. O maior valor em magnitude é o da categoria “Encartuchado”, −13,66.
+
+Como o quadro apresentado na monografia, na forma consultada, não é utilizado aqui para estabelecer uma lista de significância estatística individual dos coeficientes, a análise enfatiza seus sinais e magnitudes e utiliza o teste F para a significância conjunta do modelo.
+
+## 4.2 Significância global do modelo
+
+O trabalho reporta estatística F = 2,27, com 13 graus de liberdade no numerador e 70 no denominador, p = 0,015 e R² = 0,296. Como verificação interna, o p-valor também pode ser recalculado a partir da estatística F e dos graus de liberdade informados:
+
+```{r}
+estatistica_F <- 2.27
+gl1 <- 13
+gl2 <- 70
+p_valor_calculado <- pf(estatistica_F, gl1, gl2, lower.tail = FALSE)
+r2 <- 0.296
+
+resultados_F <- tibble(
+  Estatistica = estatistica_F,
+  gl1 = gl1,
+  gl2 = gl2,
+  `p-valor calculado` = p_valor_calculado,
+  `R²` = r2
+)
+
+resultados_F
+```
+
+Usando os valores arredondados reportados na monografia, o cálculo resulta em p ≈ 0,0147, valor consistente com o p = 0,015 apresentado pelo autor. Portanto, rejeita-se a hipótese nula de que, conjuntamente, os coeficientes das variáveis explicativas sejam iguais a zero. Há evidência estatística de associação entre o conjunto de regressores e o *overbreak*.
+
+O R² de 0,296 indica que 29,6% da variabilidade observada do *overbreak* é explicada pela especificação estimada. Isso mostra que o modelo contém informação relevante, mas também que uma parcela majoritária da variabilidade permanece fora da explicação do modelo.
+
+O R², por si só, não determina se o modelo é “bom” ou “ruim” e tampouco mede diretamente a capacidade de previsão fora da amostra. Isso é particularmente importante porque o objetivo declarado do estudo é **predizer** o *overbreak*. A monografia apresenta o ajuste do modelo e suas equações, mas não reporta uma separação entre amostra de estimação e amostra de teste, erro de previsão fora da amostra ou outro procedimento de validação preditiva. Assim, o trabalho demonstra ajuste dentro da amostra, mas não permite avaliar diretamente como o modelo se comportaria ao prever novos desmontes.
+
+## 4.3 Diagnósticos reportados no trabalho
+
+```{r}
+diagnosticos <- tribble(
+  ~Diagnostico, ~Estatistica, ~p_valor, ~Leitura,
+  "Durbin-Watson", 1.75, 0.070, "p > 0,05; não há evidência suficiente para rejeitar H0",
+  "Shapiro-Wilk", 0.978, 0.167, "p > 0,05; não rejeitar H0 de normalidade",
+  "VIF máximo", 2.50, NA, "Abaixo do limiar de triagem de 5 utilizado no trabalho"
+)
+
+diagnosticos
+```
+
+O maior VIF reportado é 2,50, na variável CM, não indicando um problema elevado de multicolinearidade segundo o critério utilizado no próprio trabalho.
+
+O teste de Shapiro-Wilk apresenta W = 0,978 e p = 0,167. Não se rejeita a hipótese nula de normalidade ao nível de 5%. Isso é compatível com a conclusão apresentada pelo autor.
+
+# 5. Análise crítica da aplicação econométrica
+
+## 5.1 O que as evidências permitem afirmar?
+
+A principal cautela interpretativa é diferenciar **associação estatística** de **causalidade**. O fato de um coeficiente ser positivo ou negativo no modelo significa que a variável está associada ao *overbreak*, condicionalmente às demais variáveis incluídas. O desenho apresentado no trabalho não estabelece, por si só, que alterações exógenas em uma variável produzirão causalmente uma mudança no *overbreak*.
+
+Essa distinção é especialmente importante quando o próprio trabalho utiliza expressões como “causas” e “influência”. Os resultados permitem identificar relações condicionais estimadas pelo modelo; uma interpretação causal exigiria pressupostos e estratégias adicionais de identificação.
+
+## 5.2 Erro na regra de decisão do teste de Durbin-Watson
+
+Este é o problema mais claramente demonstrado no texto da monografia.
+
+O trabalho reporta estatística DW = 1,75 e p = 0,070. Em seguida afirma que, como p \> 0,05, a hipótese nula é rejeitada e a alternativa é aceita. Essa regra está invertida.
+
+Adotando a regra geral de decisão utilizada na própria análise estatística do trabalho, quando p \> α **não se rejeita H0**. Portanto, a formulação correta é:
+
+> com p = 0,070 \> 0,05, não há evidência suficiente para rejeitar a hipótese nula do teste.
+
+A conclusão substantiva de ausência de evidência de autocorrelação de primeira ordem é compatível com essa decisão, mas a justificativa textual apresentada no trabalho está incorreta.
 
 ```{r}
 alpha <- 0.05
 p_dw <- 0.070
 
-decisao <- if (p_dw < alpha) "Rejeita H0" else "Não rejeita H0"
-decisao
+if (p_dw < alpha) {
+  "Rejeitar H0"
+} else {
+  "Não rejeitar H0"
+}
 ```
 
-*A regra de decisão padrão é rejeitar H0 apenas quando p \< alpha. Com p = 0,070 \> 0,05, a decisão correta é **não rejeitar H0**. O texto do trabalho, porém, afirma o contrário: "a hipótese nula H0 é rejeitada e a hipótese alternativa H1 é aceita". A conclusão final sobre não haver autocorrelação até coincide com o que se esperaria (H0 do teste DW costuma ser "não há autocorrelação"), mas o caminho lógico descrito está invertido. Um erro de interpretação do teste de hipótese, e não uma questão de opinião.*
+## 5.3 Questão anterior à própria decisão do Durbin-Watson: a adequação do teste ao desenho dos dados
 
-## 4. Fragilidade das estimativas: subcategorias pequenas e influência não investigada — sustentando a crítica 2
+Há uma questão metodológica mais profunda.
 
-```{r}
-contagens <- bind_rows(
-  contagem_tp |> rename(categoria = tipo_escavacao),
-  contagem_ex |> rename(categoria = tipo_explosivo)
-)
-contagens
-```
+O trabalho descreve a amostra como 84 desmontes distribuídos em vários pontos da mina e não apresenta uma série temporal nem uma ordenação temporal das observações. Entretanto, o Durbin-Watson foi utilizado para avaliar autocorrelação de primeira ordem.
 
-Regra prática de triagem da Aula 8 para alta alavancagem: h_ii \> 2(k + 1)/n. Para o modelo do trabalho, k = 13 (o gl1 do teste F) e n = 84.
+O teste de Durbin-Watson é especialmente associado à correlação serial em observações ordenadas. Em um conjunto de dados de corte transversal, sem uma ordem temporal ou espacial claramente definida, a pertinência do teste precisa ser justificada. Como a monografia não apresenta essa justificativa nem informa uma ordenação das observações, o resultado do Durbin-Watson deve ser interpretado com cautela.
 
-```{r}
-n_total <- 84
-k_preditores <- 13
+Portanto, a crítica não é apenas que a regra de decisão foi descrita de forma invertida: **a própria necessidade e adequação do teste ao desenho dos dados não é suficientemente demonstrada no trabalho**.
 
-limite_h <- 2 * (k_preditores + 1) / n_total
-limite_h
-```
+## 5.4 Heterocedasticidade não é investigada
 
-Como a dummy de cada categoria está no modelo, cada observação de uma categoria com m casos tem alavancagem de pelo menos 1/m. Comparando com o limite de triagem:
+Entre os diagnósticos apresentados estão Durbin-Watson, VIF e Shapiro-Wilk, mas não é reportado um diagnóstico específico para verificar se a variância dos erros é constante.
 
-```{r}
-contagens |>
-  mutate(
-    h_minimo = 1 / n,
-    atinge_limite = round(h_minimo, 4) >= round(limite_h, 4)
-  ) |>
-  arrange(n)
-```
+Essa ausência é relevante porque o *overbreak* apresenta ampla dispersão: a média é 24,0%, o máximo é 84,4% e existem outliers identificados em algumas variáveis. Em um contexto assim, seria pertinente ao menos discutir a possibilidade de heterocedasticidade.
 
-*Com base nessa análise, podemos observar dois pontos:*
+Sem essa verificação, não é possível saber, a partir do trabalho, se os erros-padrão utilizados para as inferências são adequados sob a hipótese de variância constante.
 
-*(a) Subcategorias pequenas: os 3 desmontes com explosivo ENCARTUCHADO têm alavancagem mínima de 1/3 ≈ 0,33, igual ao limite de triagem (0,33). O coeficiente dessa categoria (−13,66) depende de apenas 3 observações. Além disso, 3 observações não cobrem os 4 tipos de escavação, então pelo menos uma das combinações ENCARTUCHADO × tipo de escavação, entre as 20 equações finais, é extrapolação. Lembrar que é uma regra de triagem, não um teste formal.*
+Essa é uma **limitação da documentação da aplicação**, e não permite afirmar que o modelo efetivamente sofre de heterocedasticidade.
 
-*(b) Influência não investigada: o trabalho identifica outliers por boxplot em OB, PL, CE, CM e Q e decide não removê-los, porque não havia erro de registro. Porém, não apresenta alavancagem, DFBETAS/DFFITS nem compara o modelo com e sem esses casos. Como visto na Aula 8, um valor incomum não é necessariamente influente: influência é o quanto os coeficientes mudam quando a observação sai. Sem os dados brutos, não dá para afirmar que as estimativas são instáveis, apenas que a estabilidade não foi demonstrada.*
+## 5.5 Categoria com apenas três observações
 
-## 5. R² baixo e variável omitida
+A categoria “Encartuchado” possui somente três observações, enquanto outras categorias possuem dezenas. Isso merece atenção porque os respectivos efeitos são estimados com suporte empírico muito menor.
 
-*Os próprios autores reconhecem que o modelo explica apenas 29,6% da variabilidade do overbreak e citam uma variável omitida (desvio da perfuração linear) que não foi incluída. Isso conecta diretamente com o conceito de viés de variável omitida estudado na Atividade 2. Mesmo quando reconhecido pelos próprios autores, um R² baixo é um sinal de que fatores relevantes continuam fora do modelo.*
+Há, ainda, quatro tipos de escavação e cinco tipos de explosivo. Com apenas três observações na categoria “Encartuchado”, necessariamente existe pelo menos uma combinação entre tipo de escavação e esse tipo de explosivo que não foi observada na amostra.
 
-## 6. Falta de termo de interação entre TP e EX
+Isso não significa que o modelo seja matematicamente inválido. A especificação com efeitos principais consegue gerar previsões para combinações não observadas porque estima separadamente os efeitos de TP e EX. O problema é substantivo: sem uma interação TP × EX, o modelo pressupõe que o efeito de um explosivo é o mesmo, em termos aditivos, independentemente do tipo de escavação.
 
-*O modelo (Equação 5) inclui TP e EX apenas de forma aditiva (cada um soma um efeito fixo, independente do outro). Porém, o próprio trabalho apresenta 20 equações diferentes, uma para cada combinação possível de TP e EX. O que sugere que, na prática, o efeito do tipo de explosivo pode depender do tipo de escavação. Isso é exatamente o que um termo de interação (TP*EX) capturaria de forma mais direta e testável estatisticamente, em vez de simplesmente somar os coeficientes de cada dummy separadamente.\*
+Assim, a pequena quantidade de observações em algumas categorias reduz a força empírica para avaliar diferenças entre esses cenários.
 
-## 7. Pontos positivos a reconhecer
+## 5.6 Triagem de possível alavancagem
 
-*(i) o cálculo e a interpretação do VIF (todos os valores abaixo de 5, portanto sem indício de multicolinearidade problemática) e do teste de Shapiro-Wilk (p = 0,167, não há evidência para rejeitar a normalidade dos resíduos) foram feitos corretamente e de forma clara;*
+Uma forma adicional de fazer uma **triagem de possível alavancagem** seria comparar os valores de leverage individuais com uma regra de bolso, como $2p/n$, em que $p$ representa o número de parâmetros estimados, incluindo o intercepto. Neste modelo, há 13 regressores (incluindo as dummies) e mais o intercepto, totalizando 14 parâmetros. Uma regra de bolso de $2p/n$ resulta em $2(14)/84 \approx 0,333$. Esse valor deve ser entendido apenas como **limite de alerta**, não como a alavancagem observada de qualquer desmonte. Para calcular o leverage $h_{ii}$ de cada observação seriam necessários os dados originais e a matriz de desenho do modelo. Portanto, a categoria “Encartuchado”, com apenas três observações, merece investigação adicional, mas não se pode concluir, a partir da monografia, que essas três observações apresentem alta alavancagem.
 
-*(ii) o trabalho não removeu os outliers sem evidência de erro de registro, o que está de acordo com a orientação da Aula 8 (verificar erros e entender o contexto antes de excluir). O passo seguinte, avaliar a sensibilidade das conclusões a esses casos, é o que faltou (item 4).*
+## 5.7 Ausência de interação entre tipo de escavação e tipo de explosivo
 
-## 8. Síntese da análise crítica
+O trabalho apresenta 20 equações resultantes das combinações entre TP e EX, mas o modelo estimado utiliza apenas os efeitos principais das duas variáveis categóricas.
 
-*Em resumo, pode-se concluir que o trabalho analisado, apesar da interessante premissa, tem uma notória fragilidade estatística, que compromete, de certa forma, os resultados obtidos. Alguns pontos destacados são:*
+Uma extensão natural seria testar um termo de interação **TP × EX**. Esse termo permitiria verificar se a associação entre determinado explosivo e *overbreak* depende do tipo de escavação.
 
-1.  *Erro de interpretação do teste de Durbin-Watson (item 3).*
-2.  *Estimativas frágeis: subcategorias minúsculas (ENCARTUCHADO com n = 3, alavancagem mínima no limite de triagem) e influência dos outliers não investigada (item 4).*
-3.  *R² baixo e variável omitida já reconhecida pelos próprios autores (item 5).*
-4.  *Ausência de termo de interação entre TP e EX, apesar do próprio desenho do trabalho sugerir essa necessidade (item 6).*
+Essa possibilidade é particularmente relevante porque a interpretação operacional do explosivo pode plausivelmente variar conforme a geometria e as características da frente. Contudo, a existência de uma interação não pode ser presumida: ela deveria ser testada empiricamente.
 
-*Entretanto, é importante reconher os seus pontos positivos (item 7): o VIF e o teste de Shapiro-Wilk foram bem calculados e bem interpretados, e os outliers não foram removidos sem evidência de erro.*
+Portanto, trata-se de uma **possível melhoria de especificação**, e não de um erro que invalide automaticamente o modelo original.
 
-*Como sugestão, uma extensão possível para a evolução do trabalho seria a aplicação de uma regressão robusta (lmrob) para checar se os coeficientes se mantêm, e uma regressão quantílica para os overbreaks altos, já que a distribuição do OB tem cauda à direita (média 24,0 acima da mediana 22,1; máximo 84,4 contra 3º quartil 30,3) e o interesse operacional está em evitar os casos extremos.*
+## 5.8 Outliers: decisão defensável, mas análise de influência incompleta
+
+O autor identifica outliers em OB, PL, CE, CM e Q por meio de boxplots e decide mantê-los porque não foram encontrados erros de medição ou registro.
+
+Essa decisão é defensável: uma observação atípica não deve ser eliminada automaticamente apenas por ser extrema.
+
+O ponto que permanece em aberto é a **influência** dessas observações sobre os coeficientes. A análise poderia ser aprofundada com algum diagnóstico de influência, caso os dados estivessem disponíveis. Sem os dados brutos, não é possível concluir que os outliers efetivamente distorcem as estimativas; é possível apenas dizer que sua influência não foi demonstrada no trabalho.
+
+## 5.9 R² de 29,6% e variável omitida
+
+O próprio autor reconhece que as variáveis incluídas explicam 29,6% da variabilidade do *overbreak* e aponta o desvio da perfuração linear como uma variável potencialmente relevante que não foi incorporada.
+
+Esse reconhecimento é importante. Entretanto, a simples omissão de uma variável relevante não implica automaticamente viés dos coeficientes. Para haver viés por variável omitida, é necessário, entre outras condições, que a variável omitida esteja relacionada a uma ou mais variáveis incluídas no modelo.
+
+Assim, a formulação mais precisa é que a especificação pode estar sujeita a **viés por variável omitida** caso fatores relevantes e correlacionados com os regressores observados tenham sido deixados de fora.
+
+Além disso, o R² relativamente modesto indica que o modelo deixa grande parcela da variabilidade sem explicação. Isso limita a interpretação do modelo como uma representação completa do fenômeno, ainda que o teste F indique significância conjunta.
+
+## 5.10 Tamanho da amostra e quantidade de parâmetros
+
+A análise utiliza 84 observações e estima 14 parâmetros no modelo, considerando os 13 regressores e o intercepto, restando 70 graus de liberdade residuais.
+
+Isso não torna a regressão automaticamente inadequada, mas deixa uma amostra que não é muito folgada em relação ao número de parâmetros, reforçando a necessidade de cautela quanto à estabilidade dos coeficientes e à capacidade de generalização do modelo para novos desmontes.
+
+## 5.11 O que o trabalho faz bem
+
+A análise crítica também deve reconhecer escolhas adequadas.
+
+O trabalho faz uma descrição clara das variáveis, explicita as categorias de referência, utiliza dummies de forma coerente, reporta o teste de significância global, apresenta o VIF e o teste de Shapiro-Wilk e documenta a presença de outliers antes de decidir não removê-los.
+
+O uso do teste F também é coerente com o objetivo de avaliar a significância conjunta da especificação. Com p aproximadamente igual a 0,015, há evidência de que o conjunto de variáveis incluídas possui associação estatisticamente detectável com o *overbreak* na amostra analisada.
+
+# 6. Síntese da análise crítica
+
+A aplicação de regressão linear múltipla de Silva (2024) é coerente com o problema investigado e produz uma relação estatisticamente significativa entre o conjunto dos regressores e o *overbreak*. O modelo apresenta R² de 29,6%, VIF máximo de 2,50 e resíduos compatíveis com a normalidade segundo o teste de Shapiro-Wilk reportado.
+
+A análise crítica, entretanto, identifica alguns limites importantes para a interpretação dos resultados:
+
+1.  **Erro na regra de decisão do Durbin-Watson:** com p = 0,070, a decisão correta é não rejeitar H0, e não rejeitá-la.
+2.  **Adequação do Durbin-Watson não demonstrada:** a base é descrita como um conjunto de desmontes distribuídos em vários pontos da mina, sem uma ordenação temporal explicitada.
+3.  **Heterocedasticidade não investigada:** não é apresentado diagnóstico específico da constância da variância dos resíduos.
+4.  **Categorias muito pequenas:** “Encartuchado” possui apenas três observações.
+5.  **Alavancagem não avaliada:** a frequência muito baixa de uma categoria justifica uma verificação específica de leverage, mas não permite concluir alta alavancagem sem os dados originais.
+6.  **Ausência de interação TP × EX:** o modelo assume efeitos aditivos entre tipo de escavação e explosivo, embora as combinações entre esses fatores sejam relevantes para o problema operacional.
+7.  **Influência dos outliers não demonstrada:** a decisão de mantê-los é defensável, mas não há avaliação formal de sua influência sobre os coeficientes.
+8.  **Capacidade explicativa limitada:** R² = 29,6% indica que parcela importante da variabilidade do *overbreak* permanece fora do modelo.
+9.  **Validação preditiva incompleta:** o estudo é apresentado como um modelo de previsão, mas não mostra desempenho fora da amostra.
+10. **Interpretação causal limitada:** os resultados sustentam associações condicionais, não uma demonstração causal.
+
+Ao mesmo tempo, essas limitações não anulam o valor do estudo. O modelo constitui uma aplicação concreta de regressão múltipla a um problema real de mineração e oferece evidências iniciais sobre quais características operacionais e geológicas estão associadas ao *overbreak*.
+
+# 7. Conclusão
+
+A principal contribuição da aplicação analisada está em mostrar como uma regressão linear múltipla pode ser utilizada para transformar dados operacionais de mineração em informação quantitativa para apoio à análise do *overbreak*.
+
+Os resultados indicam associação estatisticamente significativa entre o conjunto de variáveis explicativas e o *overbreak*, mas a capacidade explicativa é parcial. Portanto, o modelo deve ser entendido como uma ferramenta inicial de análise e previsão dentro do contexto específico estudado, e não como uma explicação completa ou causal do fenômeno.
+
+Do ponto de vista econométrico, a análise mostra que uma regressão não deve ser avaliada apenas pelo fato de possuir um R² ou um teste F significativo. É necessário verificar a coerência entre problema, dados e especificação, interpretar corretamente os testes de hipótese e avaliar se os pressupostos e limitações do modelo permitem sustentar as conclusões apresentadas.
+
+Para trabalhos futuros, as melhorias mais diretamente relacionadas aos resultados observados seriam: ampliar a base de dados; investigar a heterocedasticidade; avaliar a influência das observações extremas; e testar, caso haja suporte empírico suficiente, uma especificação com interação entre tipo de escavação e tipo de explosivo.
+
+# Referência principal
+
+SILVA, Davi Arantes. **Modelo de regressão linear múltipla para previsão de overbreak em escavações subterrâneas de desenvolvimento**. 2024. Trabalho de Conclusão de Curso (Graduação em Engenharia de Minas) regressãoEscola de Minas, Universidade Federal de Ouro Preto, Ouro Preto, 2024.
