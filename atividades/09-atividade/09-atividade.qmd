@@ -1,6 +1,6 @@
 ---
 lang: "pt-BR"
-title: "Atividade 8 - Econometria Aplicada à Finanças"
+title: "Atividade 9 - Econometria Aplicada à Finanças"
 author: "Jonathan Vargas Silva"
 format:
   html:
@@ -13,28 +13,85 @@ execute:
   message: false
 ---
 
+# Configuração
+
+```{r}
+options(digits = 5, scipen = 999)
+
+library(tidyverse)
+library(Ecdat)
+library(marginaleffects)
+
+data("Hmda", package = "Ecdat")
+
+hmda <- Hmda %>%
+  mutate(deny_num = as.integer(ifelse(deny == "yes", 1, 0))) %>%
+  drop_na()
+
+glimpse(hmda)
+```
+
 # Questões
 
-Considere que um analista ou pesquisador estima, por MQO, uma regressão para relacionar o retorno excedente de uma ação ao retorno excedente do mercado, ou seja, que estime o CAPM.
-
-Após examinar os resultados, surgem três perguntas:
+Considere os dados `Hmda` (pacote `Ecdat`), com pedidos de hipoteca em Boston. A variável `deny_num` vale 1 se o crédito foi negado e 0 caso contrário. As explicativas são `lvr` (razão empréstimo/valor do imóvel, em proporção), `pbcr` (histórico público de crédito ruim) e `single` (solteiro).
 
 
-## 1. Alguns meses específicos alteram substantivamente o beta estimado ou os valores ajustados da regressão?
+## A) Estima um modelo Probit e um modelo Logit para a probabilidade de negativa do crédito, usando `lvr`, `pbcr` e `single`.
 
-Diagnósticos de influência: medem quanto o beta (DFBETAS) e os valores ajustados (DFFITS) mudam quando cada mês é excluído da amostra. Permitem identificar meses que merecem investigação (erro de registro, contexto econômico) e avaliar se as conclusões dependem deles. Não autorizam, por si só, excluir a observação.
+```{r}
+# Estima a probabilidade de negativa em função de lvr, pbcr e single.
+modelo_probit <- glm(deny_num ~ lvr + pbcr + single,
+                     family = binomial(link = "probit"),
+                     data = hmda)
+
+modelo_logit <- glm(deny_num ~ lvr + pbcr + single,
+                    family = binomial(link = "logit"),
+                    data = hmda)
+
+summary(modelo_probit)
+summary(modelo_logit)
+```
+
+Nos dois modelos, `lvr`, `pbcr` e `single` têm coeficientes positivos e significativos: aumentam a chance de negativa do crédito. Os coeficientes do Logit são maiores que os do Probit porque as escalas são diferentes. Como os modelos são não lineares, os coeficientes **não** são efeitos sobre a probabilidade; por isso usamos os efeitos parciais médios (APEs) no item B.
 
 
-## 2. A relação estimada por MQO é excessivamente sensível a determinadas observações?
+## B) Calcula os efeitos parciais médios (APEs) com intervalos de confiança de 95%.
 
-Regressão robusta: reestima os coeficientes por um método menos sensível a observações incomuns, dando peso menor a elas. Os pesos mostram quais meses pesaram menos. Comparando com o MQO, permite concluir se a relação depende de poucas observações extremas (coeficientes mudam muito) ou se se mantém (coeficientes parecidos).
+```{r}
+# Obtém os APEs (com IC de 95%) para a amostra completa.
+avg_slopes(modelo_probit, by = TRUE)
+avg_slopes(modelo_logit, by = TRUE)
+```
+
+### 1. Os APEs de Probit e Logit levam a conclusões semelhantes?
+
+Sim. Os APEs são praticamente iguais nos dois modelos (lvr ≈ 0,26 vs. 0,28; pbcr ≈ 0,30 vs. 0,30; single ≈ 0,047 vs. 0,046), com os mesmos sinais. A escolha entre Probit e Logit pouco altera os resultados.
+
+### 2. Interpreta os APEs do Probit.
+
+Mantidas as demais variáveis constantes, em média:
+
+- **lvr:** um aumento de 0,10 na razão empréstimo/valor do imóvel eleva a probabilidade de negativa em cerca de **2,6 pontos percentuais** (aproximadamente 0,26 × 0,10).
+- **pbcr:** ter histórico público de crédito ruim eleva a probabilidade de negativa em cerca de **30 pontos percentuais**.
+- **single:** ser solteiro eleva a probabilidade de negativa em cerca de **4,7 pontos percentuais**.
+
+Os intervalos de confiança de 95% não incluem o zero: os três efeitos são estatisticamente significativos. O maior efeito é o do histórico de crédito ruim.
 
 
-## 3. A associação entre o retorno da ação e o retorno do mercado é a mesma nos diferentes quantis condicionais do retorno da ação?
+## C) Calcula o pseudo-R² de McFadden dos dois modelos e compare.
 
-Regressão quantílica: estima a relação entre o retorno da ação e o do mercado em diferentes quantis condicionais do retorno da ação (por exemplo: 10%, 50% e 90%), e não só na média, como o MQO. Se as inclinações forem parecidas entre os quantis, a associação é semelhante ao longo da distribuição. Se forem diferentes, a sensibilidade ao mercado muda entre retornos baixos, medianos e altos da ação.
+```{r}
+# Calcula o pseudo-R2 de McFadden com as deviances de cada modelo.
+pseudoR2_probit <- 1 - modelo_probit$deviance / modelo_probit$null.deviance
+pseudoR2_logit  <- 1 - modelo_logit$deviance / modelo_logit$null.deviance
+
+pseudoR2_probit
+pseudoR2_logit
+```
+
+O pseudo-R² de McFadden é de cerca de 0,107 nos dois modelos: os valores são praticamente iguais, ou seja, os modelos ajustam os dados de forma semelhante. Essa medida **não** é a proporção da variação de Y explicada pelo modelo, como no R² do MQO; serve principalmente para comparar modelos estimados com os mesmos dados.
 
 
 ## Conclusão
 
-As ferramentas não são substitutas porque solucionam questões diferentes: os diagnósticos identificam quais observações influenciam o resultado, a regressão robusta reduz essa influência na estimação e a regressão quantílica verifica se a relação muda ao longo da distribuição do retorno da ação. São complementares porque, juntas, mostram quais casos pesam, se a conclusão resiste a eles e se a relação é a mesma em todos os quantis.
+Probit e Logit levam à mesma conclusão: ter histórico de crédito ruim é o fator que mais aumenta a probabilidade de negativa (cerca de 30 pp), seguido de maior razão empréstimo/valor (cerca de 2,6 pp para cada 0,10) e de ser solteiro (cerca de 4,7 pp). Os coeficientes diferem em escala, mas os APEs e o pseudo-R² são quase idênticos.
