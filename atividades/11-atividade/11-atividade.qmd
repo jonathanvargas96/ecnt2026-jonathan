@@ -2,7 +2,7 @@
 lang: "pt-BR"
 title: "Atividade Prática 11"
 subtitle: "Econometria Aplicada a Finanças <br> Mestrado Profissional em Administração"
-author: "ESCREVA SEU NOME AQUI"
+author: "Jonathan Vargas Silva"
 title-block-banner: "#27445C"
 date: today
 date-format: long
@@ -105,17 +105,16 @@ ggplot2::ggplot(
 
 ### Respostas
 
-**a)** *Escreva sua resposta aqui.*
+**a)** A unidade de observação é o agricultor (605 agricultores). A variável que representa a contratação do seguro é `tookup` (1 = contratou, 0 = não contratou); `contratacoes` é apenas a soma de `tookup` calculada na tabela. A modalidade de tratamento é identificada por `treatment` (texto) e pelas dummies `A2` e `B`. A variável `fid1` identifica o agrupamento administrativo (field) de cada agricultor; é um identificador, não uma medida, e define os efeitos fixos da Questão 6. `A2` e `B` valem zero para o grupo A1 porque A1 é a modalidade de referência (pagamento antecipado integral): esses agricultores não receberam nenhuma das outras duas ofertas.
 
 
-**b)** *Escreva sua resposta aqui.*
-
+**b)** Os três grupos têm número parecido de agricultores (A1: 196; A2: 205; B: 204). A taxa de contratação é baixa em A1 (4,6%; 9 de 196) e em A2 (5,9%; 12 de 205) e muito maior em B (71,6%; 146 de 204). 
 
 
 
 ## Questão 2 — Identificação causal
 
-*Escreva sua resposta aqui.*
+Como as modalidades foram atribuídas por sorteio, os grupos são, em média, parecidos em todas as características (observadas e não observadas), e a única diferença sistemática é a modalidade oferecida. Por isso, a diferença nas taxas de contratação pode ser interpretada como efeito causal, sem o viés de seleção dos estudos observacionais, em que quem escolhe a modalidade pode ser diferente de quem não escolhe.
 
 
 
@@ -130,7 +129,7 @@ A função `fixest::feols()` estima o modelo por mínimos quadrados ordinários.
 # Complete apenas os nomes das variáveis na fórmula do modelo sem efeitos fixos.
 # Estima por MQO as diferenças de contratação em relação ao grupo A1.
 modelo_linear <- fixest::feols(
-  ____ ~ ____ + ____,
+  tookup ~ A2 + B,
   data = dados_seguro,
   vcov = "iid"
 )
@@ -157,10 +156,10 @@ Na linha `A2`, a coluna `estimate` apresenta o coeficiente estimado, e `conf.low
 
 ### Respostas
 
-**a)** *Escreva sua resposta aqui.*
+**a)** O coeficiente de `A2` é cerca de 0,0126, ou seja, 1,26 pontos percentuais. Em média, a taxa de contratação com o desconto de 30% no pagamento antecipado é 1,3 p.p. maior do que com o pagamento antecipado integral (A1). Como a atribuição foi aleatória, essa é a estimativa do efeito causal do desconto.
 
 
-**b)** *Escreva sua resposta aqui.*
+**b)** O intervalo de confiança de 95% vai de cerca de −5,0 a +7,5 pontos percentuais. Como o intervalo inclui o zero, não podemos rejeitar que o efeito do desconto seja nulo: o efeito não é estatisticamente diferente de zero. Ou seja, não há evidência de que o desconto de 30% aumente a contratação.
 
 
 
@@ -225,22 +224,22 @@ Relacione o intercepto e essa soma às proporções observadas nas duas modalida
 
 ### Respostas
 
-**a)** *Escreva sua resposta aqui.*
+**a)** A proporção de contratação em B é 0,7157 e em A1 é 0,0459. A diferença (B − A1) é de cerca de 0,6698, ou seja, 66,98 pontos percentuais.
 
 
 
-**b)** *Escreva sua resposta aqui.*
+**b)** A diferença é igual ao coeficiente de `B` no modelo sem efeitos fixos (0,6698), considerando o arredondamento.
 
 
 
-**c)** *Escreva sua resposta aqui.*
+**c)** O intercepto (cerca de 0,0459) é a proporção de contratação de A1, o grupo de referência (com `A2` e `B` iguais a zero). A soma do intercepto com o coeficiente de `B` (0,0459 + 0,6698 = 0,7157) é a proporção de contratação do grupo B. Por isso o coeficiente de `B` é exatamente a diferença entre as proporções de B e A1: a regressão com dummies reproduz as médias dos grupos. Interpretação: a taxa de contratação em B é cerca de 67 pontos percentuais maior do que em A1.
 
 
 
 
 ## Questão 5 — Efeito causal e mecanismos econômicos
 
-*Escreva sua resposta aqui.*
+Não. O experimento identifica o efeito causal da modalidade (pagar na colheita aumenta a contratação em cerca de 67 p.p.), mas não o mecanismo. A restrição de liquidez é uma explicação plausível, porém não necessariamente a única: preferências intertemporais e riscos de cumprimento contratual, também investigados pelos autores, podem contribuir.
 
 
 
@@ -258,7 +257,7 @@ a fórmula e mantenha essas opções.
 # Estima os efeitos dos tratamentos, controlando as diferenças entre agrupamentos.
 # Preserva a amostra e utiliza a inferência convencional da especificação original.
 modelo_efeitos_fixos <- fixest::feols(
-  ____ ~ ____ + ____ | ____,
+  tookup ~ A2 + B | fid1,
   data = dados_seguro,
   vcov = "iid",
   fixef.rm = "none"
@@ -340,7 +339,7 @@ Coeficientes em proporções (×100 = pontos percentuais).
 
 ### Respostas
 
-**a)** *Escreva sua resposta aqui.*
+**a)** Os efeitos fixos dos agrupamentos controlam as diferenças médias entre os 171 agrupamentos administrativos (*fields*): o modelo compara agricultores do mesmo agrupamento. São pertinentes porque o sorteio das modalidades foi feito dentro dos agrupamentos (que funcionam como estratos). A identificação causal **não depende** dos efeitos fixos: ela vem da aleatorização. Eles apenas refletem o desenho do experimento.
 
 
-**b)** *Escreva sua resposta aqui.*
+**b)** Sem efeitos fixos, `A2` ≈ 0,013 (1,3 p.p.) e `B` ≈ 0,670 (67,0 p.p.). Com efeitos fixos, `A2` ≈ 0,004 (0,4 p.p.) e `B` ≈ 0,675 (67,5 p.p.). Os coeficientes e os intervalos de confiança são muito parecidos. O intervalo de `A2` inclui o zero nos dois modelos, e o de `B` fica longe do zero nos dois. As conclusões econômicas não mudam: o desconto não tem efeito estatisticamente significativo, e o pagamento na colheita aumenta fortemente a contratação. Os valores com efeitos fixos coincidem com a coluna 1 da Tabela 2 do artigo (`A2` = 0,004; `B` = 0,675).

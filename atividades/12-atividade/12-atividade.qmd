@@ -1,0 +1,84 @@
+---
+lang: "pt-BR"
+title: "Atividade Prática 12 — Respostas"
+subtitle: "Econometria Aplicada à Finanças <br> Mestrado Profissional em Administração"
+author: "Jonathan Vargas Silva"
+title-block-banner: "#27445C"
+date: 2026-11-11
+date-format: long
+format:
+  html:
+    embed-resources: true
+    toc: true
+    toc-location: left
+    toc-title: "Navegação"
+    code-copy: true
+    fig-dpi: 300
+execute:
+  echo: true
+  warning: false
+  message: false
+engine: knitr
+---
+
+## 1. Dados
+
+Carrega a base `fulton` do pacote `fixest`, com 97 dias de negociação no mercado de peixe de Fulton.
+
+```{r}
+#| label: dados
+
+# Carrega os dados do mercado de Fulton.
+data("fulton", package = "fixest")
+```
+
+## 2. Estimação por MQO e VI/MQ2E
+
+Ambas as estimações utilizam erros-padrão convencionais (`vcov = "iid"`).
+
+```{r}
+#| label: modelos
+
+# Estima a demanda por MQO, incluindo o preço e a tendência temporal.
+modelo_mqo <- fixest::feols(
+  qty ~ price + t,
+  data = fulton,
+  vcov = "iid"
+)
+
+# Estima por MQ2E, usando vento e ondas como instrumentos do preço.
+modelo_vi <- fixest::feols(
+  qty ~ t | price ~ speed2 + wave2,
+  data = fulton,
+  vcov = "iid"
+)
+```
+
+## 3. Resultados
+
+### 3.1 Primeiro estágio
+
+```{r}
+#| label: primeiro-estagio
+
+# Exibe a regressão do primeiro estágio.
+summary(modelo_vi, stage = 1)
+```
+
+### 3.2 Coeficiente do preço por MQO
+
+```{r}
+#| label: coef-mqo
+
+# Exibe a estimativa MQO do coeficiente do preço.
+coef(modelo_mqo)["price"]
+```
+
+### 3.3 Segundo estágio
+
+```{r}
+#| label: segundo-estagio
+
+# Exibe a regressão do segundo estágio.
+summary(modelo_vi, stage = 2)
+```
