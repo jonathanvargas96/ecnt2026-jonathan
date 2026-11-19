@@ -89,11 +89,11 @@ resultado_cusum
 
 ::: {.callout-note title="Sua resposta"}
 
-- Sim, ultrapassa, durante período aproximado de 1882 a 1925, chegando no seu pico máximo, por volta de 1898;
+- O processo OLS-CUSUM ultrapassa o limite crítico superior de 5%, com seu maior afastamento por volta de 1898;
 
-- S0 = 2.95, p-value = 0.000000054;
+- A estatística do teste é S0 ≈ 2,9518, com p-valor ≈ 5,4 × 10⁻⁸;
 
-- Ao nível de significância de 5%, há forte evidência estatística contra a hipótese de estabilidade da média do fluxo anual do Nilo.
+- Como o p-valor é muito inferior a 0,05, rejeitamos a hipótese nula de estabilidade. Portanto, o gráfico e o teste formal fornecem evidência de que a média do fluxo anual do Nilo não permaneceu constante ao longo da amostra.
 :::
 
 
@@ -130,11 +130,11 @@ quebra_nilo
 
 ::: {.callout-note title="Sua resposta"}
 
-- sup.F = 75.9, p-value = 0.00000000000000022. Portanto, conclui-se que, ao nível de significância de 5%, há evidência de uma mudança abrupta na média;
+- A estatística supF é aproximadamente 75,93, com p-valor ≈ 2,22 × 10⁻¹⁶. Como o valor é muito inferior a 0,05, rejeitamos a hipótese de estabilidade e concluímos que há evidência de uma mudança abrupta na média;
 
-- Ano associado à quebra estimada: 1898. Ou seja, em 1898 termina o primeiro regime e em 1899 começa o segundo;
+- A quebra estimada está na observação 28, correspondente a 1898. Portanto, 1898 é o último ano do primeiro regime e 1899 é o primeiro ano do segundo;
 
-- A localização encontrada coincide exatamente com a construção da primeira barragem de Assuã. Essa proximidade temporal não é suficiente, por si só, para estabelecer que essa obra causou a mudança. Porém, pode-se dizer que é um forte indício;
+- A quebra ocorre próximo ao período associado à construção da primeira barragem de Assuã. Essa proximidade pode ajudar na interpretação histórica, mas não demonstra, por si só, que a barragem causou a mudança;
 
-- Os resultados do  teste supF e do OLS-CUSUM são muito próximos, sendo o ano associado à quebra estimada (sup.F) o mesmo do pico máximo do nível do processo de flutuação empírica (OLS-CUSUM).
+- Os dois testes fornecem evidência consistente contra a estabilidade da média, mas têm objetivos diferentes. O OLS-CUSUM avalia a estabilidade ao longo da amostra, sem localizar formalmente a quebra. Já o teste supF investiga uma mudança abrupta com ponto de quebra desconhecido e, por meio de `breakpoints(estatisticas_f)`, permite identificar a divisão estimada em 1898.
 :::
