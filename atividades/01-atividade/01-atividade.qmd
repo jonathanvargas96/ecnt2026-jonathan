@@ -109,7 +109,7 @@ tabela_resultados <- bind_rows(
 print(tabela_resultados)
 ```
 
-Com base nas estimativas pontuais dos betas ($\hat{\beta}$), pode-se concluir que a empresa mais agressiva parece ser a Ford ($\hat{\beta} \approx 1,66$). Por ter o maior beta ($\hat{\beta} > 1$), a ação varia proporcionalmente mais do que o mercado. Em contrapartida, a mais defensiva parece ser a Exxon-Mobil ($\hat{\beta} \approx 0,46$). Por ter o menor beta ($\hat{\beta} < 1$), a ação é menos volátil que o mercado.
+Com base nas estimativas pontuais dos betas ($\hat{\beta}$), pode-se concluir que a empresa mais agressiva parece ser a Ford ($\hat{\beta} \approx 1,66$). Por ter o maior beta ($\hat{\beta} > 1$), a ação varia proporcionalmente mais do que o mercado. Em contrapartida, a mais defensiva parece ser a Exxon-Mobil ($\hat{\beta} \approx 0,46$). Por ter o menor beta ($\hat{\beta} < 1$), a ação é menos sensível às oscilações do mercado.
 
 Analisar apenas a estimativa pontual é insuficiente porque esse valor depende totalmente da amostra de 180 meses utilizada e mudaria em outro período. Além disso, sem o erro-padrão e o intervalo de confiança, não é possível medir a precisão da estimativa nem realizar testes de hipóteses para confirmar se um beta próximo de 1 representa uma diferença real em relação ao mercado ou apenas um ruído do acaso.
 
@@ -138,7 +138,7 @@ Para testar a hipótese nula $H_0: \alpha = 0$ contra a alternativa $H_1: \alpha
 
 - Exxon-Mobil: O $p$-valor do intercepto é maior que $0,05$ e o intervalo de confiança inclui o zero. Portanto, não se rejeita $H_0$. Não há evidência para rejeitar a hipótese de que o intercepto é igual a zero, o que é coerente com a teoria do CAPM.
 
-Portanto, pode-se concluir que, em todos os três casos, os resultados empíricos sustentam a previsão teórica do CAPM de que o termo de intercepto (alfa) é estatisticamente igual a zero.
+Portanto, em todos os três casos, não há evidência estatística de que o intercepto (alfa) seja diferente de zero, o que é coerente com a previsão do CAPM. Isso, porém, não prova que o alfa seja zero nem comprova a validade do CAPM.
 
 
 ## E
@@ -153,11 +153,11 @@ broom::tidy(capm_xom, conf.int = TRUE) |>
 
 Com 95% de confiança, o beta da Exxon-Mobil está entre aproximadamente 0,32 e 0,60 (valores exatos na saída do R), e o beta da Microsoft está entre aproximadamente 0,96 e 1,44.
 
-- Exxon-Mobil (β ≈ 0,46): o intervalo inteiro fica abaixo de 1. Isso significa que pode-se afirmar que essa ação é realmente defensiva, visto que ela tende a variar menos que o mercado como um todo. Em momentos de queda do mercado, a Exxon tende a cair menos e em momentos de alta, também deve subir menos. É uma ação mais indicada para quem busca menor volatilidade.
+- Exxon-Mobil (β ≈ 0,46): o intervalo inteiro fica abaixo de 1. Isso significa que pode-se afirmar que essa ação é realmente defensiva, visto que ela tende a reagir menos às oscilações do mercado como um todo. Em momentos de queda do mercado, a Exxon tende a cair menos e em momentos de alta, também deve subir menos. Isso indica menor exposição ao risco de mercado, mas não garante menor volatilidade total.
 
 - Microsoft (β ≈ 1,20): o intervalo de confiança inclui o valor 1. Isso indica que, apesar da estimativa pontual sugerir uma ação um pouco mais agressiva que o mercado, não se tem certeza estatística de que o beta seja realmente diferente de 1. Ou seja, não dá para garantir que a Microsoft se comporte de forma mais arriscada que o mercado, visto que ela pode, na prática, ter risco semelhante ao mercado.
 
-Orientação: para um investidor que busca equilíbrio na carteira, a Exxon-Mobil pode ajudar a reduzir a volatilidade, já que seu beta é estatisticamente menor que 1. Já a Microsoft, apesar de a estimativa pontual sugerir um comportamento um pouco mais agressivo, não apresenta diferença estatisticamente significativa em relação ao mercado.
+Orientação: para um investidor que busca equilíbrio na carteira, a Exxon-Mobil pode ajudar a reduzir a exposição da carteira ao risco de mercado, já que seu beta é estatisticamente menor que 1. Já a Microsoft, apesar de a estimativa pontual sugerir um comportamento um pouco mais agressivo, não apresenta diferença estatisticamente significativa em relação ao mercado.
 
 
 ## F
@@ -175,13 +175,13 @@ car::linearHypothesis(capm_xom, "ret_mkt_excedente = 1")
 
 Interpretando o resultado do teste, ao nível de significância de 5%, pode-se concluir que:
 
-- Ford: O $p$-valor do teste é menor que $0,05$. Portanto, rejeita-se $H_0$. Conclui-se que o beta da Ford é estatisticamente diferente de $1$, confirmando que a ação é agressiva e mais volátil do que o mercado;
+- Ford: O $p$-valor do teste é menor que $0,05$. Portanto, rejeita-se $H_0$. Conclui-se que o beta da Ford é estatisticamente diferente de $1$, confirmando que a ação é agressiva e mais sensível às oscilações do mercado;
 
-- General Electric: O $p$-valor do teste é maior que $0,05$. Portanto, não se rejeita $H_0$. Apesar do beta estimado ser $1,15$, a diferença em relação a $1,0$ não é estatisticamente significante. A GE comporta-se com o mesmo nível de risco do mercado;
+- General Electric: O $p$-valor do teste é maior que $0,05$. Portanto, não se rejeita $H_0$. Apesar do beta estimado ser $1,15$, a diferença em relação a $1,0$ não é estatisticamente significante. Não há evidência de que o risco da GE seja diferente do mercado (o que não prova que $\beta = 1$);
 
 - Exxon-Mobil: O $p$-valor do teste é menor que $0,05$. Portanto, rejeita-se $H_0$. O beta da Exxon é estatisticamente diferente de $1$, confirmando seu perfil defensivo de menor risco.
 
-No contexto do CAPM, um ativo com $\beta = 1$ possui o mesmo nível de risco sistemático que a carteira de mercado. Isso significa que a ação oscila na mesma proporção e direção do mercado geral, acompanhando exatamente as expansões e retrações econômicas.
+No contexto do CAPM, um ativo com $\beta = 1$ possui o mesmo nível de risco sistemático que a carteira de mercado. Isso significa que a ação oscila na mesma proporção e direção do mercado geral, acompanhando, em média, as expansões e retrações do mercado.
 
 
 ## G
@@ -201,7 +201,7 @@ Análise do Intervalo de Confiança
 
 Interpretação Econômica ($\beta < 1$ no CAPM)
 
-- No contexto do CAPM, um beta menor que 1 significa que o ativo é menos volátil ou defensivo em relação ao mercado. Nesse caso, a ação tem uma exposição abaixo da média ao risco sistemático de mercado. Portanto, a sua sensibilidade às oscilações do mercado é menor, visto que, para cada $1\%$ de variação no mercado, a ação tende a variar apenas cerca de $0,46\%$ na mesma direção.
+- No contexto do CAPM, um beta menor que 1 significa que o ativo é defensivo, isto é, menos sensível às oscilações do mercado. Nesse caso, a ação tem uma exposição abaixo da média ao risco sistemático de mercado. Portanto, a sua sensibilidade às oscilações do mercado é menor, visto que, para cada $1\%$ de variação no mercado, a ação tende a variar apenas cerca de $0,46\%$ na mesma direção.
 
 
 ## H
@@ -226,4 +226,4 @@ broom::tidy(capm_msft, conf.int = TRUE) |>
 summary(capm_ford)$adj.r.squared
 ```
 
-O $R^2$ ajustado do modelo da Ford (aproximadamente $0,26$ ou $26\%$) indica que cerca de $26\%$ da variação do prêmio de risco das ações da Ford é explicada pelo prêmio de risco do mercado por meio do CAPM, enquanto os $74\%$ restantes são devidos a riscos idiossincráticos e fatores específicos da própria empresa. O $R^2$ ajustado é uma medida superior ao $R^2$ simples porque inclui uma penalidade pelo número de variáveis explicativas no modelo: enquanto o $R^2$ simples cresce (ou permanece igual) de forma artificial a cada variável adicionada, o $R^2$ ajustado só aumenta se a nova variável trouxer um ganho real de explicação, tornando-o o indicador ideal e justo para comparar modelos com diferentes quantidades de regressores.
+O $R^2$ ajustado do modelo da Ford (aproximadamente $0,26$ ou $26\%$) indica que cerca de $26\%$ da variação do prêmio de risco das ações da Ford é explicada pelo prêmio de risco do mercado por meio do CAPM, enquanto os $74\%$ restantes não são explicados pelo mercado e ficam com fatores específicos da empresa e outros fatores. O $R^2$ ajustado é uma medida superior ao $R^2$ simples porque inclui uma penalidade pelo número de variáveis explicativas no modelo: enquanto o $R^2$ simples cresce (ou permanece igual) de forma artificial a cada variável adicionada, o $R^2$ ajustado só aumenta se a nova variável trouxer um ganho real de explicação, tornando-o mais adequado para comparar modelos com diferentes quantidades de regressores (com a mesma variável dependente).

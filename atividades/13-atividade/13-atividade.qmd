@@ -355,7 +355,8 @@ $$
 \begin{aligned}
 \Delta\bar Y_C
 &=\bar Y_{C,1}-\bar Y_{C,0}\\
-&=\ldots\text{ pontos percentuais}.
+&=21{,}358-26{,}130\\
+&=-4{,}772\text{ pontos percentuais}.
 \end{aligned}
 $$
 
@@ -363,11 +364,12 @@ $$
 \begin{aligned}
 \widehat{\bar Y}_{T,1}^{(0)}
 &=\bar Y_{T,0}+\Delta\bar Y_C\\
-&=\ldots
+&=19{,}941+(-4{,}772)\\
+&=15{,}169\%.
 \end{aligned}
 $$
 
-*Escreva aqui sua interpretação do resultado contrafactual.*
+No grupo de controle, a proporção de pessoas sem seguro-saúde caiu 4,772 pontos percentuais entre 2013 e 2015. Aplicando essa mesma variação aos estados tratados, estimamos que, sem a expansão do Medicaid, 15,169% das pessoas desses estados estariam sem seguro em 2015 (contrafactual). Isso vale sob a hipótese de tendências paralelas.
 
 ---
 
@@ -378,12 +380,12 @@ $$
 $$
 \begin{aligned}
 \bar Y_{T,1}-\widehat{\bar Y}_{T,1}^{(0)}
-&=\ldots\\
-&=\ldots\text{ pontos percentuais}.
+&=10{,}598-15{,}169\\
+&=-4{,}571\text{ pontos percentuais}.
 \end{aligned}
 $$
 
-*Escreva aqui sua comparação e a interpretação da diferença obtida.*
+Em 2015, a proporção de pessoas sem seguro nos estados tratados (10,598%) ficou 4,571 pontos percentuais abaixo da que esperaríamos sem a expansão (15,169%). Esse valor é igual ao coeficiente `tratado:depois` da regressão ($-0{,}0457$, ou $-4{,}571$ p.p.).
 
 ---
 
@@ -400,7 +402,8 @@ $$
 \begin{aligned}
 \Delta\bar Y_T
 &=\bar Y_{T,1}-\bar Y_{T,0}\\
-&=\ldots\text{ pontos percentuais}.
+&=10{,}598-19{,}941\\
+&=-9{,}343\text{ pontos percentuais}.
 \end{aligned}
 $$
 
@@ -408,14 +411,23 @@ $$
 \begin{aligned}
 \widehat{\delta}_{DiD}
 &=\Delta\bar Y_T-\Delta\bar Y_C\\
-&=\ldots\text{ pontos percentuais}.
+&=-9{,}343-(-4{,}772)\\
+&=-4{,}571\text{ pontos percentuais}.
 \end{aligned}
 $$
 
 **Por que os dois procedimentos produzem o mesmo resultado?**
 
-*Escreva aqui sua explicação.*
+Porque são a mesma conta escrita de duas formas. Como o contrafactual é $\bar Y_{T,0}+\Delta\bar Y_C$:
+
+$$
+\bar Y_{T,1}-\widehat{\bar Y}_{T,1}^{(0)}
+=\bar Y_{T,1}-\bar Y_{T,0}-\Delta\bar Y_C
+=\Delta\bar Y_T-\Delta\bar Y_C.
+$$
+
+Nos dois casos, descontamos da variação dos estados tratados a variação que também ocorreu no grupo de controle. O resultado ($-4{,}571$ p.p.) é igual ao coeficiente `tratado:depois` da regressão.
 
 **Por que não podemos atribuir toda a redução observada à expansão do Medicaid?**
 
-*Escreva aqui sua explicação.*
+Porque a queda de 9,343 p.p. nos estados tratados inclui uma queda de 4,772 p.p. que também ocorreu nos estados de controle, que não expandiram o Medicaid. Essa parte vem de outros fatores comuns aos dois grupos e não pode ser atribuída à política. Só a parte que excede a queda do controle ($-4{,}571$ p.p.) pode ser associada à expansão, e apenas se a hipótese de tendências paralelas for válida, o que não é testado aqui. A estimativa também é imprecisa: o erro-padrão agrupado é de cerca de 2,556 p.p. (valor-p = 0,0819), e o intervalo de confiança de 95% (de cerca de $-9{,}75$ a $0{,}61$ p.p.) inclui o zero.

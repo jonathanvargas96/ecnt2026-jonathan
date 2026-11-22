@@ -2370,7 +2370,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Data de Publicação</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">18 de agosto de 2026</p>
+        <p class="date">19 de novembro de 2026</p>
       </div>
     </div>
     
@@ -2434,7 +2434,7 @@ window.Quarto = {
 </div>
 </div>
 <p><strong>a.</strong> Identifique os parâmetros populacionais, as variáveis aleatórias e as estimativas calculadas com a amostra. Diferencie <code>beta_1</code> do coeficiente de <code>x</code> retornado por <code>lm()</code>.</p>
-<p>Os parâmetros populacionais são _0, _1 e . As variáveis aleatórias são x_i e _i. As estimativas são 1,08 para _0 e 3,03 para <code>x</code>. O _1 é um parâmetro populacional e o coeficiente de <code>x</code>, retornado por `lm() é uma estimativa.</p>
+<p>Os parâmetros populacionais são _0, _1 e . As variáveis aleatórias são x_i, y_i e _i. As estimativas são 1,08 para _0 e 3,03 para o coeficiente de <code>x</code>. O _1 é um parâmetro populacional e o coeficiente de <code>x</code>, retornado por `lm() é uma estimativa.</p>
 <p><strong>b.</strong> Compare as estimativas com os parâmetros populacionais. Explique por que elas não precisam ser exatamente iguais aos parâmetros.</p>
 <p>As estimativas não precisam ser iguais aos parâmetros populacionais porque a amostra é apenas uma realização aleatória entre muitas possíveis.</p>
 <p><strong>c.</strong> Execute o gráfico e explique o que representam os pontos, a reta e a dispersão vertical em torno dela.</p>
@@ -2509,7 +2509,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>O formato de funil indica mudança na variância condicional porque a dispersão vertical dos pontos em torno de zero aumenta conforme x se afasta de zero. Isso não indica mudança na média condicional, pois os pontos continuam centrados em torno de zero em todos os valores de x.</p>
+<p>Os pontos continuam centrados em torno de zero, mas a dispersão vertical aumenta conforme x aumenta. Isso ocorre porque o desvio-padrão condicional cresce com x, indicando uma mudança na variância condicional, e não necessariamente na média condicional dos erros.</p>
 <p><strong>c.</strong> Estime o modelo, compare as estimativas com os parâmetros populacionais e explique por que os erros verdadeiros não são idênticos aos resíduos.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estima o modelo por MQO</span></span>
@@ -2547,7 +2547,7 @@ window.Quarto = {
 6   1.28    1.12</code></pre>
 </div>
 </div>
-<p>As estimativas ficaram próximas dos parâmetros verdadeiros, mas os erros-padrão são maiores que no modelo, porque o resíduo depende dos coeficientes estimados, que mudam de uma amostra para outra.</p>
+<p>As estimativas ficaram próximas dos parâmetros verdadeiros, mas os erros-padrão são maiores do que no modelo, refletindo a heterocedasticidade dos erros. Já o resíduo e o erro verdadeiro não são idênticos porque o resíduo depende dos coeficientes estimados, que variam de uma amostra para outra, enquanto o erro verdadeiro depende dos parâmetros populacionais, que são fixos.</p>
 <p><strong>d.</strong> Execute o gráfico <code>Residuals vs Fitted</code> e escreva uma interpretação clara e objetiva, com três a cinco frases.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Seleciona o gráfico Residuals vs Fitted</span></span>
@@ -2561,7 +2561,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>A posição dos resíduos em relação a zero se distancia ao longo do eixo <code>x</code>. A sua dispersão vertical não permanece aproximadamente constante e, por isso o padrão observado não é compatível com homocedasticidade, visto que o gráfico representa um formato de funil, que é um claro exemplo de heterocedasticidade.</p>
+<p>Os resíduos permanecem distribuídos em torno de zero, mas sua dispersão vertical aumenta com os valores ajustados, formando um funil. Esse padrão não é compatível com variância condicional constante e sugere a presença de heterocedasticidade. Como se trata de uma avaliação visual, a conclusão pode ser complementada por um teste formal.</p>
 <p><strong>e.</strong> Explique se a heterocedasticidade, isoladamente, torna os estimadores de MQO viesados neste processo gerador. Use em sua justificativa a hipótese <span class="math inline">\(E(\varepsilon_i\mid x_i)=0\)</span>.</p>
 <p>Não, a heterocedasticidade, de forma isolada, não torna os estimadores de MQO viesados. Visto que, a hipótese de E(_ix_i)=0 pode ser mantida nesta simulação.</p>
 </section>
@@ -2638,7 +2638,7 @@ window.Quarto = {
 <pre><code>[1] 6.9697e-19</code></pre>
 </div>
 </div>
-<p>A estatística do teste é 83,61 e o valor-p é aproximadamente 6,97×10⁻¹⁹. Como esse valor é muito menor que 0,05, há evidência estatística suficiente para rejeitar a hipótese nula de homocedasticidade.</p>
+<p>A estatística do teste é 83,61 e o valor-p é aproximadamente 6,97×10⁻¹⁹. Como esse valor é muito menor que 0,05, há evidência estatística suficiente para rejeitar a hipótese nula de homocedasticidade ((H_0:(_ix_i)=^2).</p>
 <p><strong>c.</strong> Execute a função pronta, compare a estatística e o valor-<em>p</em> com o cálculo manual e explique a eventual exibição de um valor-<em>p</em> igual a <code>0</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Executa o teste de White a partir do modelo estimado</span></span>

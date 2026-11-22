@@ -52,7 +52,7 @@ summary(modelo_probit)
 summary(modelo_logit)
 ```
 
-Nos dois modelos, `lvr`, `pbcr` e `single` têm coeficientes positivos e significativos: aumentam a chance de negativa do crédito. Os coeficientes do Logit são maiores que os do Probit porque as escalas são diferentes. Como os modelos são não lineares, os coeficientes **não** são efeitos sobre a probabilidade; por isso usamos os efeitos parciais médios (APEs) no item B.
+Os dois modelos foram estimados com as mesmas 2.380 observações. Em ambos, `lvr`, `pbcr` e `single` têm coeficientes positivos e significativos: aumentam a chance de negativa do crédito. Os coeficientes do Logit são maiores que os do Probit porque as escalas das duas funções são diferentes. Como os modelos são não lineares, os coeficientes **não** representam diretamente mudanças na probabilidade; por isso usamos os efeitos parciais médios (APEs) no item B.
 
 
 ## B) Calcula os efeitos parciais médios (APEs) com intervalos de confiança de 95%.
@@ -65,15 +65,16 @@ avg_slopes(modelo_logit, by = TRUE)
 
 ### 1. Os APEs de Probit e Logit levam a conclusões semelhantes?
 
-Sim. Os APEs são praticamente iguais nos dois modelos (lvr ≈ 0,26 vs. 0,28; pbcr ≈ 0,30 vs. 0,30; single ≈ 0,047 vs. 0,046), com os mesmos sinais. A escolha entre Probit e Logit pouco altera os resultados.
+Sim. Os APEs são muito próximos nos dois modelos: para `lvr`, 0,2634 no Probit e 0,2763 no Logit; para `pbcr`, 0,3029 e 0,2976; e para `single`, 0,0470 e 0,0463. Os sinais também são iguais. Portanto, a escolha entre Probit e Logit pouco altera os resultados.
 
 ### 2. Interpreta os APEs do Probit.
 
-Mantidas as demais variáveis constantes, em média:
+Para `lvr`, que é uma variável contínua, o efeito parcial médio é aproximadamente 0,2634. Assim, um aumento de 0,10 na razão empréstimo/valor do imóvel está associado a um aumento aproximado de **2,63 pontos percentuais** na probabilidade prevista de negativa (0,2634 × 0,10). Essa é uma aproximação; a mudança exata depende das características de cada requerente.
 
-- **lvr:** um aumento de 0,10 na razão empréstimo/valor do imóvel eleva a probabilidade de negativa em cerca de **2,6 pontos percentuais** (aproximadamente 0,26 × 0,10).
-- **pbcr:** ter histórico público de crédito ruim eleva a probabilidade de negativa em cerca de **30 pontos percentuais**.
-- **single:** ser solteiro eleva a probabilidade de negativa em cerca de **4,7 pontos percentuais**.
+Para as variáveis binárias, o efeito representa a diferença entre as probabilidades previstas quando a variável passa de 0 para 1, mantendo as demais características nos valores observados. O APE é a média dessas diferenças na amostra.
+
+- **pbcr:** ter histórico público de crédito ruim está associado a uma probabilidade prevista de negativa aproximadamente **30,29 pontos percentuais** maior.
+- **single:** ser solteiro está associado a uma probabilidade prevista de negativa aproximadamente **4,70 pontos percentuais** maior.
 
 Os intervalos de confiança de 95% não incluem o zero: os três efeitos são estatisticamente significativos. O maior efeito é o do histórico de crédito ruim.
 
@@ -89,7 +90,7 @@ pseudoR2_probit
 pseudoR2_logit
 ```
 
-O pseudo-R² de McFadden é de cerca de 0,107 nos dois modelos: os valores são praticamente iguais, ou seja, os modelos ajustam os dados de forma semelhante. Essa medida **não** é a proporção da variação de Y explicada pelo modelo, como no R² do MQO; serve principalmente para comparar modelos estimados com os mesmos dados.
+O pseudo-R² de McFadden é aproximadamente 0,1066 no Probit e 0,1074 no Logit. Os valores são muito próximos, indicando que os modelos apresentam qualidade de ajuste semelhante nesta aplicação. Essa medida compara o ajuste do modelo estimado com o de um modelo que contém apenas o intercepto. Apesar do nome, ela **não** representa a proporção da variação de Y explicada pelo modelo, como no R² do MQO.
 
 
 ## Conclusão

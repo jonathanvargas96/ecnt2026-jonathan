@@ -71,7 +71,7 @@ estimativas calculadas com a amostra. Diferencie `beta_1` do coeficiente de `x`
 retornado por `lm()`.
 
 Os parâmetros populacionais são \beta_0, \beta_1 e \sigma. As variáveis aleatórias são \qquad
-x_i e \varepsilon_i. As estimativas são 1,08 para \beta_0 e 3,03 para `x`. O \beta_1 é um parâmetro populacional e o coeficiente de `x`, retornado por `lm() é uma estimativa.
+x_i, y_i e \varepsilon_i. As estimativas são 1,08 para \beta_0 e 3,03 para o coeficiente de `x`. O \beta_1 é um parâmetro populacional e o coeficiente de `x`, retornado por `lm() é uma estimativa.
 
 
 **b.** Compare as estimativas com os parâmetros populacionais. Explique por que
@@ -158,7 +158,7 @@ ggplot(dados_hetero, aes(x = x, y = erro)) +
   theme_minimal()
 ```
 
-O formato de funil indica mudança na variância condicional porque a dispersão vertical dos pontos em torno de zero aumenta conforme x se afasta de zero. Isso não indica mudança na média condicional, pois os pontos continuam centrados em torno de zero em todos os valores de x.
+Os pontos continuam centrados em torno de zero, mas a dispersão vertical aumenta conforme x aumenta. Isso ocorre porque o desvio-padrão condicional cresce com x, indicando uma mudança na variância condicional, e não necessariamente na média condicional dos erros.
 
 
 **c.** Estime o modelo, compare as estimativas com os parâmetros populacionais e
@@ -199,7 +199,7 @@ clara e objetiva, com três a cinco frases.
 plot(modelo_hetero, which = 1)
 ```
 
-A posição dos resíduos em relação a zero se distancia ao longo do eixo `x`. A sua dispersão vertical não permanece aproximadamente constante e, por isso o padrão observado não é compatível com homocedasticidade, visto que o gráfico representa um formato de funil, que é um claro exemplo de heterocedasticidade.
+Os resíduos permanecem distribuídos em torno de zero, mas sua dispersão vertical aumenta com os valores ajustados, formando um funil. Esse padrão não é compatível com variância condicional constante e sugere a presença de heterocedasticidade. Como se trata de uma avaliação visual, a conclusão pode ser complementada por um teste formal.
 
 
 **e.** Explique se a heterocedasticidade, isoladamente, torna os estimadores de
@@ -286,7 +286,7 @@ estatistica_white
 valor_p_white
 ```
 
-A estatística do teste é 83,61 e o valor-p é aproximadamente 6,97×10⁻¹⁹. Como esse valor é muito menor que 0,05, há evidência estatística suficiente para rejeitar a hipótese nula de homocedasticidade.
+A estatística do teste é 83,61 e o valor-p é aproximadamente 6,97×10⁻¹⁹. Como esse valor é muito menor que 0,05, há evidência estatística suficiente para rejeitar a hipótese nula de homocedasticidade (\(H_0:\operatorname{Var}(\varepsilon_i\mid x_i)=\sigma^2\).
 
 
 **c.** Execute a função pronta, compare a estatística e o valor-*p* com o

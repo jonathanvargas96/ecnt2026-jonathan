@@ -2370,7 +2370,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Data de Publicação</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">8 de setembro de 2026</p>
+        <p class="date">19 de novembro de 2026</p>
       </div>
     </div>
     
@@ -2426,7 +2426,7 @@ Coefficients:
 </div>
 </div>
 <p>Interprete economicamente o coeficiente de <code>diff_mr</code> e classifique o modelo como estático ou dinâmico, justificando sua resposta.</p>
-<p>O modelo é estático, porque relaciona a variação da construção residencial em determinado mês apenas com variações de outras variáveis no mesmo mês. Não há nenhuma variável defasada entre as explicativas.</p>
+<p>O coeficiente de diff_mr (-41,60) indica que, mantidas as demais variáveis constantes, um aumento de um ponto percentual na variação mensal da taxa hipotecária está associado a uma redução de aproximadamente 41,60 mil unidades na variação mensal das novas construções residenciais. O resultado é uma associação estimada, não necessariamente uma relação causal. O modelo é estático, porque relaciona variações observadas no mesmo mês, sem incluir variáveis defasadas.</p>
 </section>
 <section id="b.-diagnóstico-da-autocorrelação" class="level2">
 <h2 class="anchored" data-anchor-id="b.-diagnóstico-da-autocorrelação"><strong>b.</strong> Diagnóstico da autocorrelação</h2>
@@ -2445,7 +2445,7 @@ Coefficients:
 <p>Com base no gráfico, avalie a presença de autocorrelação e o sinal sugerido nas primeiras defasagens.</p>
 <ol type="1">
 <li>No gráfico em questão observa-se a presença de autocorrelação.</li>
-<li>O sinal da autocorrelação sugerida nas primeiras defasagens é a proporcionalidade inversa em que os resíduos se afastam da média.</li>
+<li>O sinal da autocorrelação na primeira defasagem é negativo, visto que um resíduo acima da média em um mês tende a ser seguido por um resíduo abaixo da média no mês seguinte.</li>
 </ol>
 <p>Realize o teste de Breusch–Godfrey para autocorrelação de primeira ordem. Apresente as hipóteses, o resultado, a decisão para <span class="math inline">\(\alpha=5\%\)</span> e sua interpretação.</p>
 <p><strong>Dica:</strong> utilize <code>lmtest::bgtest()</code> com <code>order = 1</code>.</p>
@@ -2463,8 +2463,9 @@ LM test = 72.7, df = 1, p-value &lt;0.0000000000000002</code></pre>
 </div>
 <ol type="1">
 <li>H0: não há autocorrelação de primeira ordem nos erros; H1: há autocorrelação de primeira ordem.</li>
-<li>resultado_bg</li>
-<li>Com %</li>
+<li>O teste resultou em LM = 72,7 (df = 1), com p-valor extremamente pequeno (&lt;0,0000000000000002).</li>
+<li>Como o p-valor é consideravelmente menor que 0,05, rejeitamos H0.</li>
+<li>Há forte evidência estatística de autocorrelação de primeira ordem nos erros do modelo.</li>
 </ol>
 </section>
 <section id="c.-inferência-com-erros-padrão-de-neweywest" class="level2">
@@ -2506,7 +2507,11 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 </div>
 </div>
 <p>Explique por que os coeficientes permanecem os mesmos, por que os erros-padrão podem mudar e por que Newey–West é adequado ao problema diagnosticado.</p>
-<p>Escreva sua resposta aqui.</p>
+<ol type="1">
+<li>Os coeficientes de MQO permanecem os mesmos, porque Newey-West só corrige a matriz de covariância e não reestima os parâmetros do modelo.</li>
+<li>Os erros-padrão podem mudar, porque agora levam em conta a autocorrelação identificada no item b.</li>
+<li>Newey-West é adequado porque o problema diagnosticado foi justamente autocorrelação nos resíduos e é exatamente esse tipo de problema que esse estimador corrige.</li>
+</ol>
 </section>
 <section id="d.-comparando-a-inferência" class="level2">
 <h2 class="anchored" data-anchor-id="d.-comparando-a-inferência"><strong>d.</strong> Comparando a inferência</h2>
@@ -2645,10 +2650,22 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 </div>
 <p>Com base na comparação:</p>
 <ol type="1">
-<li><p>as estimativas dos coeficientes mudaram quando utilizamos Newey–West? Explique;</p></li>
-<li><p>os erros-padrão mudaram todos na mesma direção? Identifique pelo menos um coeficiente cujo erro-padrão aumentou e um cujo erro-padrão diminuiu, caso isso ocorra;</p></li>
-<li><p>compare os intervalos de confiança convencionais com os intervalos obtidos com Newey–West. Houve mudanças relevantes na incerteza associada às estimativas?</p></li>
-<li><p>alguma conclusão inferencial é alterada ao utilizar Newey–West, considerando <span class="math inline">\(\alpha=5\%\)</span>?</p></li>
+<li>as estimativas dos coeficientes mudaram quando utilizamos Newey–West? Explique;</li>
+</ol>
+<p>Não. Os coeficientes são idênticos nas duas colunas de estimativa, pois Newey-West não reestima os parâmetros, só corrige os erros-padrão.</p>
+<ol start="2" type="1">
+<li>os erros-padrão mudaram todos na mesma direção? Identifique pelo menos um coeficiente cujo erro-padrão aumentou e um cujo erro-padrão diminuiu, caso isso ocorra;</li>
+</ol>
+<p>Não. O erro-padrão de <code>diff_mr</code> diminuiu, enquanto o de diff_industry aumentou.</p>
+<ol start="3" type="1">
+<li>compare os intervalos de confiança convencionais com os intervalos obtidos com Newey–West. Houve mudanças relevantes na incerteza associada às estimativas?</li>
+</ol>
+<p>Sim, principalmente para <code>diff_mr</code>. O intervalo convencional é [−87,08; 3,87] e o de Newey-West é [−78,55; −4,66].</p>
+<ol start="4" type="1">
+<li>alguma conclusão inferencial é alterada ao utilizar Newey–West, considerando <span class="math inline">\(\alpha=5\%\)</span>?</li>
+</ol>
+<p>Sim. Para <code>diff_mr</code>, o p-valor convencional é 0,073, mas o p-valor de Newey-West é 0,027. Ou seja, ao corrigir a autocorrelação, o efeito do <code>diff_mr</code> passa a ser estatisticamente significativo.</p>
+<ol start="5" type="1">
 <li><p>escolha <strong>um coeficiente</strong> e faça uma interpretação conjunta de:</p>
 <ul>
 <li>sua magnitude;</li>
@@ -2658,7 +2675,7 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 </ul></li>
 </ol>
 <p>Não limite sua interpretação à comparação do valor-<span class="math inline">\(p\)</span> com o nível de significância.</p>
-<p>Escreva sua resposta aqui.</p>
+<p>O coeficiente de diff_mr é grande em magnitude (−41,60), sugerindo um efeito economicamente relevante. Porém, o cálculo convencional de incerteza era tão amplo que o intervalo de confiança incluía o zero, impedindo rejeitar a hipótese de efeito nulo. Ao corrigir a incerteza para a autocorrelação presente nos dados (Newey–West), o intervalo ficou mais estreito e deixou de incluir o zero, e o p-valor caiu para 0,027, fornecendo evidência estatística de uma associação negativa entre a taxa hipotecária e as novas construções residenciais, algo que a inferência convencional não conseguia confirmar.</p>
 </section>
 </section>
 

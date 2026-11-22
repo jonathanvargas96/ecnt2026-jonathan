@@ -70,7 +70,7 @@ modelo
 Interprete economicamente o coeficiente de `diff_mr` e classifique o modelo
 como estático ou dinâmico, justificando sua resposta.
 
-O coeficiente de `diff_mr` (-41.60) é economicamente coerente, visto que juros mais altos encarecem o financiamento imobiliário e desestimulam novas construções. O modelo é estático, porque relaciona a variação da construção residencial em determinado mês apenas com variações de outras variáveis no mesmo mês. Não há nenhuma variável defasada entre as explicativas.
+O coeficiente de diff_mr (-41,60) indica que, mantidas as demais variáveis constantes, um aumento de um ponto percentual na variação mensal da taxa hipotecária está associado a uma redução de aproximadamente 41,60 mil unidades na variação mensal das novas construções residenciais. O resultado é uma associação estimada, não necessariamente uma relação causal. O modelo é estático, porque relaciona variações observadas no mesmo mês, sem incluir variáveis defasadas.
 
 ## **b.** Diagnóstico da autocorrelação
 
@@ -239,4 +239,4 @@ Sim. Para `diff_mr`, o p-valor convencional é 0,073, mas o p-valor de Newey-Wes
 Não limite sua interpretação à comparação do valor-$p$ com o nível de
 significância.
 
-O coeficiente de diff_mr é grande em magnitude (−41,60), sugerindo um efeito economicamente relevante. Porém, o cálculo convencional de incerteza era tão amplo que o intervalo de confiança incluía o zero, impedindo rejeitar a hipótese de efeito nulo. Ao corrigir a incerteza para a autocorrelação presente nos dados (Newey-West), o intervalo ficou mais estreito e deixou de incluir o zero, e o p-valor caiu para 0,027, fornecendo evidência estatística de que a taxa de hipoteca de fato reduz as novas construções residenciais no mesmo mês, algo que a inferência convencional não conseguia confirmar..
+O coeficiente de diff_mr é grande em magnitude (−41,60), sugerindo um efeito economicamente relevante. Porém, o cálculo convencional de incerteza era tão amplo que o intervalo de confiança incluía o zero, impedindo rejeitar a hipótese de efeito nulo. Ao corrigir a incerteza para a autocorrelação presente nos dados (Newey–West), o intervalo ficou mais estreito e deixou de incluir o zero, e o p-valor caiu para 0,027, fornecendo evidência estatística de uma associação negativa entre a taxa hipotecária e as novas construções residenciais, algo que a inferência convencional não conseguia confirmar.

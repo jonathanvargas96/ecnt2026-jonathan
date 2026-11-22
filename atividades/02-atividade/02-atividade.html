@@ -2231,7 +2231,7 @@ background: #27445C;
       <div>
       <div class="quarto-title-meta-heading">Data de Publicação</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">17 de agosto de 2026</p>
+        <p class="date">19 de novembro de 2026</p>
       </div>
     </div>
     
@@ -2265,7 +2265,7 @@ background: #27445C;
 <p><strong>b.</strong></p>
 <p>Viés(θ<sup>)=E[θ</sup>]−θ</p>
 <p><strong>c.</strong></p>
-<p>Nos importamos com o viés porque queremos que o estimador, em média, acerte o valor verdadeiro do parâmetro. Um estimador viesado erra sempre na mesma direção (pra mais ou pra menos).</p>
+<p>Nos importamos com o viés porque queremos que o estimador, em média, acerte o valor verdadeiro do parâmetro. Um estimador viesado tende, em média, a estimar o parâmetro acima ou abaixo do seu valor verdadeiro.</p>
 <p><strong>d.</strong></p>
 <p>Os estimadores B e C são não viesados.</p>
 <p><strong>e.</strong></p>
@@ -2321,14 +2321,14 @@ $ pct_exercise      &lt;dbl&gt; 0.50000, 0.80000, 0.59943, 0.83796, 0.54286, 0.7
 <pre><code>[1] 3106</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Número de condados distintos</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(life_df<span class="sc">$</span>county_name)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(life_df<span class="sc">$</span>county_code)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1051</code></pre>
+<pre><code>[1] 1554</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Número de estados distintos</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(life_df<span class="sc">$</span>state.abb)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(life_df<span class="sc">$</span>state_abb)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0</code></pre>
+<pre><code>[1] 50</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Número de observações em cada quartil de renda</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(life_df, income_quartile)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
@@ -2376,19 +2376,58 @@ $ pct_exercise      &lt;dbl&gt; 0.50000, 0.80000, 0.59943, 0.83796, 0.54286, 0.7
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_exercise_sd =</span> <span class="fu">sd</span>(pct_exercise)</span>
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(tabela_resultados)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Rows: 2
-Columns: 9
-$ income_quartile    &lt;dbl&gt; 1, 4
-$ life_exp_medio     &lt;dbl&gt; 78.867, 85.975
-$ life_exp_sd        &lt;dbl&gt; 1.4519, 1.3667
-$ pct_smoke_medio    &lt;dbl&gt; 0.28063, 0.12982
-$ pct_smoke_sd       &lt;dbl&gt; 0.079562, 0.079082
-$ pct_obese_medio    &lt;dbl&gt; 0.30830, 0.23308
-$ pct_obese_sd       &lt;dbl&gt; 0.089119, 0.097906
-$ pct_exercise_medio &lt;dbl&gt; 0.59716, 0.85064
-$ pct_exercise_sd    &lt;dbl&gt; 0.094268, 0.088506</code></pre>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(tabela_resultados)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 8%">
+<col style="width: 11%">
+<col style="width: 9%">
+<col style="width: 11%">
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">income_quartile</th>
+<th style="text-align: right;">life_exp_medio</th>
+<th style="text-align: right;">life_exp_sd</th>
+<th style="text-align: right;">pct_smoke_medio</th>
+<th style="text-align: right;">pct_smoke_sd</th>
+<th style="text-align: right;">pct_obese_medio</th>
+<th style="text-align: right;">pct_obese_sd</th>
+<th style="text-align: right;">pct_exercise_medio</th>
+<th style="text-align: right;">pct_exercise_sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">78.867</td>
+<td style="text-align: right;">1.4519</td>
+<td style="text-align: right;">0.28063</td>
+<td style="text-align: right;">0.07956</td>
+<td style="text-align: right;">0.30830</td>
+<td style="text-align: right;">0.08912</td>
+<td style="text-align: right;">0.59716</td>
+<td style="text-align: right;">0.09427</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">85.975</td>
+<td style="text-align: right;">1.3667</td>
+<td style="text-align: right;">0.12982</td>
+<td style="text-align: right;">0.07908</td>
+<td style="text-align: right;">0.23308</td>
+<td style="text-align: right;">0.09791</td>
+<td style="text-align: right;">0.85064</td>
+<td style="text-align: right;">0.08851</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <p>Em todas as variáveis observadas, é possível constatar que, em média, o grupo de maior renda possui os melhores indicadores médios.</p>
@@ -2433,17 +2472,17 @@ $ pct_exercise_sd    &lt;dbl&gt; 0.094268, 0.088506</code></pre>
 <p>Espera-se que a omissão do grupo de renda produza um viés para baixo na estimativa de MQO de _1. Visto que ao omitir a renda, o coeficiente do tabagismo tende a ficar mais negativo do que realmente é.</p>
 <p><strong>j.</strong></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Estima os modelos simples e com controle para alta renda.</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>modelo_simples <span class="ot">&lt;-</span> <span class="fu">lm</span>(life_exp <span class="sc">~</span> pct_smoke, <span class="at">data =</span> life_df)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>modelo_alta_renda <span class="ot">&lt;-</span> <span class="fu">lm</span>(life_exp <span class="sc">~</span> pct_smoke <span class="sc">+</span> high_income, <span class="at">data =</span> life_df)</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Organiza os resultados em uma tabela.</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>tabela_modelo <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">simples =</span> broom<span class="sc">::</span><span class="fu">tidy</span>(modelo_simples),</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">alta_renda =</span> broom<span class="sc">::</span><span class="fu">tidy</span>(modelo_alta_renda),</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">&quot;modelo&quot;</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(tabela_modelo, <span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Estima os modelos simples e com controle para alta renda.</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>modelo_simples <span class="ot">&lt;-</span> <span class="fu">lm</span>(life_exp <span class="sc">~</span> pct_smoke, <span class="at">data =</span> life_df)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>modelo_alta_renda <span class="ot">&lt;-</span> <span class="fu">lm</span>(life_exp <span class="sc">~</span> pct_smoke <span class="sc">+</span> high_income, <span class="at">data =</span> life_df)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Organiza os resultados em uma tabela.</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>tabela_modelo <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">simples =</span> broom<span class="sc">::</span><span class="fu">tidy</span>(modelo_simples),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">alta_renda =</span> broom<span class="sc">::</span><span class="fu">tidy</span>(modelo_alta_renda),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">&quot;modelo&quot;</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(tabela_modelo, <span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -2505,9 +2544,9 @@ $ pct_exercise_sd    &lt;dbl&gt; 0.094268, 0.088506</code></pre>
 <p>Sim, a mudança observada na questão J é consistente com a previsão da questão I. Visto que um aumento de 10 pontos percentuais na taxa de tabagismo está associado a uma queda de cerca de 2,48 anos na expectativa de vida no modelo simples, mas de apenas 0,46 anos no modelo que controla a renda</p>
 <p><strong>l.</strong></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estima um modelo que também controla para a condição urbana.</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>modelo_condado_urbano <span class="ot">&lt;-</span> <span class="fu">lm</span>(life_exp <span class="sc">~</span> pct_smoke <span class="sc">+</span> high_income <span class="sc">+</span> is_urban, <span class="at">data =</span> life_df)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>broom<span class="sc">::</span><span class="fu">tidy</span>(modelo_condado_urbano)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estima um modelo que também controla para a condição urbana.</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>modelo_condado_urbano <span class="ot">&lt;-</span> <span class="fu">lm</span>(life_exp <span class="sc">~</span> pct_smoke <span class="sc">+</span> high_income <span class="sc">+</span> is_urban, <span class="at">data =</span> life_df)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>broom<span class="sc">::</span><span class="fu">tidy</span>(modelo_condado_urbano)</span></code></pre></div><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 5
   term        estimate std.error statistic  p.value

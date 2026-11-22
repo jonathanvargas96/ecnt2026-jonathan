@@ -51,7 +51,7 @@ Viés(θ^)=E[θ^]−θ
 
 **c.** 
 
-Nos importamos com o viés porque queremos que o estimador, em média, acerte o valor verdadeiro do parâmetro. Um estimador viesado erra sempre na mesma direção (pra mais ou pra menos).
+Nos importamos com o viés porque queremos que o estimador, em média, acerte o valor verdadeiro do parâmetro. Um estimador viesado tende, em média, a estimar o parâmetro acima ou abaixo do seu valor verdadeiro.
 
 **d.** 
 
@@ -94,10 +94,10 @@ ncol(life_df)
 sum(complete.cases(life_df))
 
 # Número de condados distintos
-n_distinct(life_df$county_name)
+n_distinct(life_df$county_code)
 
 # Número de estados distintos
-n_distinct(life_df$state.abb)
+n_distinct(life_df$state_abb)
 
 # Número de observações em cada quartil de renda
 count(life_df, income_quartile)
@@ -135,7 +135,7 @@ tabela_resultados <- tibble(life_df) |>
     pct_exercise_sd = sd(pct_exercise)
   )
 
-glimpse(tabela_resultados)
+knitr::kable(tabela_resultados)
 ```
 
 Em todas as variáveis observadas, é possível constatar que, em média, o grupo de maior renda possui os melhores indicadores médios.

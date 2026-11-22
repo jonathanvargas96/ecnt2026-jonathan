@@ -2521,7 +2521,7 @@ window.Quarto = {
 6 Exxon     0.457      0.0716    0.315     0.598</code></pre>
 </div>
 </div>
-<p>Com base nas estimativas pontuais dos betas (<span class="math inline">\(\hat{\beta}\)</span>), pode-se concluir que a empresa mais agressiva parece ser a Ford (<span class="math inline">\(\hat{\beta} \approx 1,66\)</span>). Por ter o maior beta (<span class="math inline">\(\hat{\beta} &gt; 1\)</span>), a ação varia proporcionalmente mais do que o mercado. Em contrapartida, a mais defensiva parece ser a Exxon-Mobil (<span class="math inline">\(\hat{\beta} \approx 0,46\)</span>). Por ter o menor beta (<span class="math inline">\(\hat{\beta} &lt; 1\)</span>), a ação é menos volátil que o mercado.</p>
+<p>Com base nas estimativas pontuais dos betas (<span class="math inline">\(\hat{\beta}\)</span>), pode-se concluir que a empresa mais agressiva parece ser a Ford (<span class="math inline">\(\hat{\beta} \approx 1,66\)</span>). Por ter o maior beta (<span class="math inline">\(\hat{\beta} &gt; 1\)</span>), a ação varia proporcionalmente mais do que o mercado. Em contrapartida, a mais defensiva parece ser a Exxon-Mobil (<span class="math inline">\(\hat{\beta} \approx 0,46\)</span>). Por ter o menor beta (<span class="math inline">\(\hat{\beta} &lt; 1\)</span>), a ação é menos sensível às oscilações do mercado.</p>
 <p>Analisar apenas a estimativa pontual é insuficiente porque esse valor depende totalmente da amostra de 180 meses utilizada e mudaria em outro período. Além disso, sem o erro-padrão e o intervalo de confiança, não é possível medir a precisão da estimativa nem realizar testes de hipóteses para confirmar se um beta próximo de 1 representa uma diferença real em relação ao mercado ou apenas um ruído do acaso.</p>
 </section>
 <section id="c" class="level2">
@@ -2562,7 +2562,7 @@ window.Quarto = {
 <li><p>General Electric (GE): O <span class="math inline">\(p\)</span>-valor do intercepto também é maior que <span class="math inline">\(0,05\)</span> e o intervalo de confiança inclui o zero. Portanto, não se rejeita <span class="math inline">\(H_0\)</span>. Não há evidência para rejeitar a hipótese de que o intercepto é igual a zero, o que é coerente com a teoria do CAPM;</p></li>
 <li><p>Exxon-Mobil: O <span class="math inline">\(p\)</span>-valor do intercepto é maior que <span class="math inline">\(0,05\)</span> e o intervalo de confiança inclui o zero. Portanto, não se rejeita <span class="math inline">\(H_0\)</span>. Não há evidência para rejeitar a hipótese de que o intercepto é igual a zero, o que é coerente com a teoria do CAPM.</p></li>
 </ul>
-<p>Portanto, pode-se concluir que, em todos os três casos, os resultados empíricos sustentam a previsão teórica do CAPM de que o termo de intercepto (alfa) é estatisticamente igual a zero.</p>
+<p>Portanto, em todos os três casos, não há evidência estatística de que o intercepto (alfa) seja diferente de zero, o que é coerente com a previsão do CAPM. Isso, porém, não prova que o alfa seja zero nem comprova a validade do CAPM.</p>
 </section>
 <section id="e" class="level2">
 <h2 class="anchored" data-anchor-id="e">E</h2>
@@ -2587,10 +2587,10 @@ window.Quarto = {
 </div>
 <p>Com 95% de confiança, o beta da Exxon-Mobil está entre aproximadamente 0,32 e 0,60 (valores exatos na saída do R), e o beta da Microsoft está entre aproximadamente 0,96 e 1,44.</p>
 <ul>
-<li><p>Exxon-Mobil (β ≈ 0,46): o intervalo inteiro fica abaixo de 1. Isso significa que pode-se afirmar que essa ação é realmente defensiva, visto que ela tende a variar menos que o mercado como um todo. Em momentos de queda do mercado, a Exxon tende a cair menos e em momentos de alta, também deve subir menos. É uma ação mais indicada para quem busca menor volatilidade.</p></li>
+<li><p>Exxon-Mobil (β ≈ 0,46): o intervalo inteiro fica abaixo de 1. Isso significa que pode-se afirmar que essa ação é realmente defensiva, visto que ela tende a reagir menos às oscilações do mercado como um todo. Em momentos de queda do mercado, a Exxon tende a cair menos e em momentos de alta, também deve subir menos. Isso indica menor exposição ao risco de mercado, mas não garante menor volatilidade total.</p></li>
 <li><p>Microsoft (β ≈ 1,20): o intervalo de confiança inclui o valor 1. Isso indica que, apesar da estimativa pontual sugerir uma ação um pouco mais agressiva que o mercado, não se tem certeza estatística de que o beta seja realmente diferente de 1. Ou seja, não dá para garantir que a Microsoft se comporte de forma mais arriscada que o mercado, visto que ela pode, na prática, ter risco semelhante ao mercado.</p></li>
 </ul>
-<p>Orientação: para um investidor que busca equilíbrio na carteira, a Exxon-Mobil pode ajudar a reduzir a volatilidade, já que seu beta é estatisticamente menor que 1. Já a Microsoft, apesar de a estimativa pontual sugerir um comportamento um pouco mais agressivo, não apresenta diferença estatisticamente significativa em relação ao mercado.</p>
+<p>Orientação: para um investidor que busca equilíbrio na carteira, a Exxon-Mobil pode ajudar a reduzir a exposição da carteira ao risco de mercado, já que seu beta é estatisticamente menor que 1. Já a Microsoft, apesar de a estimativa pontual sugerir um comportamento um pouco mais agressivo, não apresenta diferença estatisticamente significativa em relação ao mercado.</p>
 </section>
 <section id="f" class="level2">
 <h2 class="anchored" data-anchor-id="f">F</h2>
@@ -2644,11 +2644,11 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 </div>
 <p>Interpretando o resultado do teste, ao nível de significância de 5%, pode-se concluir que:</p>
 <ul>
-<li><p>Ford: O <span class="math inline">\(p\)</span>-valor do teste é menor que <span class="math inline">\(0,05\)</span>. Portanto, rejeita-se <span class="math inline">\(H_0\)</span>. Conclui-se que o beta da Ford é estatisticamente diferente de <span class="math inline">\(1\)</span>, confirmando que a ação é agressiva e mais volátil do que o mercado;</p></li>
-<li><p>General Electric: O <span class="math inline">\(p\)</span>-valor do teste é maior que <span class="math inline">\(0,05\)</span>. Portanto, não se rejeita <span class="math inline">\(H_0\)</span>. Apesar do beta estimado ser <span class="math inline">\(1,15\)</span>, a diferença em relação a <span class="math inline">\(1,0\)</span> não é estatisticamente significante. A GE comporta-se com o mesmo nível de risco do mercado;</p></li>
+<li><p>Ford: O <span class="math inline">\(p\)</span>-valor do teste é menor que <span class="math inline">\(0,05\)</span>. Portanto, rejeita-se <span class="math inline">\(H_0\)</span>. Conclui-se que o beta da Ford é estatisticamente diferente de <span class="math inline">\(1\)</span>, confirmando que a ação é agressiva e mais sensível às oscilações do mercado;</p></li>
+<li><p>General Electric: O <span class="math inline">\(p\)</span>-valor do teste é maior que <span class="math inline">\(0,05\)</span>. Portanto, não se rejeita <span class="math inline">\(H_0\)</span>. Apesar do beta estimado ser <span class="math inline">\(1,15\)</span>, a diferença em relação a <span class="math inline">\(1,0\)</span> não é estatisticamente significante. Não há evidência de que o risco da GE seja diferente do mercado (o que não prova que <span class="math inline">\(\beta = 1\)</span>);</p></li>
 <li><p>Exxon-Mobil: O <span class="math inline">\(p\)</span>-valor do teste é menor que <span class="math inline">\(0,05\)</span>. Portanto, rejeita-se <span class="math inline">\(H_0\)</span>. O beta da Exxon é estatisticamente diferente de <span class="math inline">\(1\)</span>, confirmando seu perfil defensivo de menor risco.</p></li>
 </ul>
-<p>No contexto do CAPM, um ativo com <span class="math inline">\(\beta = 1\)</span> possui o mesmo nível de risco sistemático que a carteira de mercado. Isso significa que a ação oscila na mesma proporção e direção do mercado geral, acompanhando exatamente as expansões e retrações econômicas.</p>
+<p>No contexto do CAPM, um ativo com <span class="math inline">\(\beta = 1\)</span> possui o mesmo nível de risco sistemático que a carteira de mercado. Isso significa que a ação oscila na mesma proporção e direção do mercado geral, acompanhando, em média, as expansões e retrações do mercado.</p>
 </section>
 <section id="g" class="level2">
 <h2 class="anchored" data-anchor-id="g">G</h2>
@@ -2671,7 +2671,7 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 </ul>
 <p>Interpretação Econômica (<span class="math inline">\(\beta &lt; 1\)</span> no CAPM)</p>
 <ul>
-<li>No contexto do CAPM, um beta menor que 1 significa que o ativo é menos volátil ou defensivo em relação ao mercado. Nesse caso, a ação tem uma exposição abaixo da média ao risco sistemático de mercado. Portanto, a sua sensibilidade às oscilações do mercado é menor, visto que, para cada <span class="math inline">\(1\%\)</span> de variação no mercado, a ação tende a variar apenas cerca de <span class="math inline">\(0,46\%\)</span> na mesma direção.</li>
+<li>No contexto do CAPM, um beta menor que 1 significa que o ativo é defensivo, isto é, menos sensível às oscilações do mercado. Nesse caso, a ação tem uma exposição abaixo da média ao risco sistemático de mercado. Portanto, a sua sensibilidade às oscilações do mercado é menor, visto que, para cada <span class="math inline">\(1\%\)</span> de variação no mercado, a ação tende a variar apenas cerca de <span class="math inline">\(0,46\%\)</span> na mesma direção.</li>
 </ul>
 </section>
 <section id="h" class="level2">
@@ -2703,7 +2703,7 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 <pre><code>[1] 0.2618744</code></pre>
 </div>
 </div>
-<p>O <span class="math inline">\(R^2\)</span> ajustado do modelo da Ford (aproximadamente <span class="math inline">\(0,26\)</span> ou <span class="math inline">\(26\%\)</span>) indica que cerca de <span class="math inline">\(26\%\)</span> da variação do prêmio de risco das ações da Ford é explicada pelo prêmio de risco do mercado por meio do CAPM, enquanto os <span class="math inline">\(74\%\)</span> restantes são devidos a riscos idiossincráticos e fatores específicos da própria empresa. O <span class="math inline">\(R^2\)</span> ajustado é uma medida superior ao <span class="math inline">\(R^2\)</span> simples porque inclui uma penalidade pelo número de variáveis explicativas no modelo: enquanto o <span class="math inline">\(R^2\)</span> simples cresce (ou permanece igual) de forma artificial a cada variável adicionada, o <span class="math inline">\(R^2\)</span> ajustado só aumenta se a nova variável trouxer um ganho real de explicação, tornando-o o indicador ideal e justo para comparar modelos com diferentes quantidades de regressores.</p>
+<p>O <span class="math inline">\(R^2\)</span> ajustado do modelo da Ford (aproximadamente <span class="math inline">\(0,26\)</span> ou <span class="math inline">\(26\%\)</span>) indica que cerca de <span class="math inline">\(26\%\)</span> da variação do prêmio de risco das ações da Ford é explicada pelo prêmio de risco do mercado por meio do CAPM, enquanto os <span class="math inline">\(74\%\)</span> restantes não são explicados pelo mercado e ficam com fatores específicos da empresa e outros fatores. O <span class="math inline">\(R^2\)</span> ajustado é uma medida superior ao <span class="math inline">\(R^2\)</span> simples porque inclui uma penalidade pelo número de variáveis explicativas no modelo: enquanto o <span class="math inline">\(R^2\)</span> simples cresce (ou permanece igual) de forma artificial a cada variável adicionada, o <span class="math inline">\(R^2\)</span> ajustado só aumenta se a nova variável trouxer um ganho real de explicação, tornando-o mais adequado para comparar modelos com diferentes quantidades de regressores (com a mesma variável dependente).</p>
 </section>
 </section>
 

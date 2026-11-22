@@ -2231,7 +2231,7 @@ background: #27445C;
       <div>
       <div class="quarto-title-meta-heading">Data de Publicação</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">31 de agosto de 2026</p>
+        <p class="date">19 de novembro de 2026</p>
       </div>
     </div>
     
@@ -2299,7 +2299,7 @@ background: #27445C;
 </div>
 </div>
 </div>
-<p>(Interpretação SUCINTA aqui).</p>
+<p>A dispersão vertical dos resíduos não é constante, visto que, no início do eixo x, os pontos se espalham bastante e vai se estreitando ao longo deste eixo. Essa variação na amplitude da dispersão (funil) é um indício visual de heterocedasticidade.</p>
 <p><strong>b.</strong> Mantida a exogeneidade, explique as consequências da heterocedasticidade para os estimadores dos coeficientes, os erros-padrão usuais e a eficiência do MQO.</p>
 <p>Mantida a exogeneidade, a heterocedasticidade mantém os estimadores dos coeficientes, em média, corretos. Entretanto, os erros-padrão usuais ficam incorretos, prejudicando testes de hipótese e intervalos de confiança. Por consequência, o MQO deixa de ser eficiente.</p>
 <p><strong>c.</strong> Realize o teste de Goldfeld–Quandt. Apresente e interprete as hipóteses, a estatística, o valor-<em>p</em> e a decisão.</p>
@@ -2325,7 +2325,7 @@ GQ = 0.866, df1 = 1032, df2 = 1031, p-value = 0.021
 alternative hypothesis: variance changes from segment 1 to 2</code></pre>
 </div>
 </div>
-<p>H0 = variância igual nos dois grupos; H1 = variância diferente (interpretar melhor)</p>
+<p>H0: a variância dos erros é igual nos dois segmentos; H1: a variância é diferente entre eles. Como o p-valor é menor que 0,05, rejeitamos H0, pois há evidência de heterocedasticidade relacionada à taxa de tabagismo.</p>
 <p><strong>d.</strong> Realize o teste de White. Apresente e interprete as hipóteses, a estatística, o valor-<em>p</em> e a decisão.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute o teste de White a partir do modelo estimado</span></span>
@@ -2342,9 +2342,9 @@ Test Statistic: 39.96
 P-value: 0</code></pre>
 </div>
 </div>
-<p>Escreva sua interpretação SUCINTA aqui.</p>
+<p>H0: homocedasticidade dos resíduos; H1: heterocedasticidade. Com p-valor praticamente zero, rejeitamos H0 com folga, pois há forte evidência de heterocedasticidade.</p>
 <p><strong>e.</strong> Os testes de Goldfeld–Quandt e de White precisam sempre concordar? Compare os resultados desta aplicação e explique.</p>
-<p>Escreva sua resposta SUCINTA aqui.</p>
+<p>Não precisam concordar sempre, pois testam coisas diferentes. O Goldfeld-Quandt só verifica se a variância muda especificamente ao longo de uma variável. O teste de White é mais geral, capturando qualquer forma de heterocedasticidade ligada às variáveis do modelo. Neste caso, os dois rejeitaram H0, mas com força bem diferente. O primeiro rejeitou por pouco (p=0,021), enquanto o segundo rejeitou com muito mais força (p≈0).</p>
 </section>
 <section id="questão-2-convivendo-com-a-heterocedasticidade" class="level2">
 <h2 class="anchored" data-anchor-id="questão-2-convivendo-com-a-heterocedasticidade">Questão 2: Convivendo com a heterocedasticidade</h2>
@@ -2371,7 +2371,7 @@ Coefficients:
                0.0326                 2.9078  </code></pre>
 </div>
 </div>
-<p>O termo de interação mede a diferença na inclinação entre os dois grupos de renda: o quanto o efeito do tabagismo sobre a expectativa de vida muda quando comparamos o grupo de renda alta com o grupo de renda baixa. Se esse coeficiente for positivo, o efeito negativo do tabagismo é menor no grupo de renda alta.</p>
+<p>O termo de interação mede a diferença na inclinação entre os dois grupos de renda, ou seja, o quanto o efeito do tabagismo sobre a expectativa de vida muda quando comparamos o grupo de renda alta com o grupo de renda baixa. Se esse coeficiente for positivo, o efeito negativo do tabagismo é menor no grupo de renda alta.</p>
 <p><strong>b.</strong> Substitua <code>high_income = 0</code> e <code>high_income = 1</code> na equação estimada, identifique a inclinação da relação entre tabagismo e expectativa de vida em cada grupo e interprete um aumento de dez pontos percentuais no tabagismo.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a função</span></span>
@@ -2409,7 +2409,7 @@ Coefficients:
  -0.31608 </code></pre>
 </div>
 </div>
-<p>Escreva sua interpretação SUCINTA aqui.</p>
+<p>No grupo de renda mais baixa, um aumento de 10 pontos percentuais no tabagismo está associado a uma queda de aproximadamente 0,61 anos na expectativa de vida. No grupo de renda mais alta, a queda associada é menor, cerca de 0,32 anos. Ou seja, o efeito negativo do tabagismo é menos acentuado nos condados de renda mais alta.</p>
 <p><strong>c.</strong> Calcule erros-padrão HC3 e compare a inferência sobre o termo de interação com a inferência usual.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estima a matriz de covariância com a correção HC3</span></span>
@@ -2449,7 +2449,7 @@ pct_smoke:high_income   2.9078     0.7608    3.82              0.00014 ***
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 </div>
-<p>Escreva sua interpretação SUCINTA aqui.</p>
+<p>O erro-padrão HC3 ficou um pouco maior que o usual para o termo de interação, reduzindo a estatística t. Mesmo assim, a interação continua estatisticamente significativa nos dois casos, ou seja, a conclusão não muda.</p>
 <p><strong>d.</strong> Estime o modelo por MQP com <code>weights = pop</code>, calcule HC3 para os dois modelos e compare os resultados. Discuta também o significado da ponderação.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estima o modelo ponderado pela população do condado</span></span>
@@ -2724,25 +2724,25 @@ function tinytable_rank_sorter(a, b, aRow, bRow, column, dir, sorterParams) {
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_9l5rdlomddi5rjda50vl = TinyTable.createTableFunctions("tinytable_9l5rdlomddi5rjda50vl");
+      const tableFns_jfjfnv1clsmuk4oti4gp = TinyTable.createTableFunctions("tinytable_jfjfnv1clsmuk4oti4gp");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '18', j: 2 }, { i: '18', j: 3 } ], css_id: 'tinytable_css_3t5n14kydmzl0v76djzp',}, 
-          { positions: [ { i: '10', j: 2 }, { i: '10', j: 3 } ], css_id: 'tinytable_css_2qfukyblwjbxx5fs55aq',}, 
-          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '15', j: 2 }, { i: '16', j: 2 }, { i: '17', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '15', j: 3 }, { i: '16', j: 3 }, { i: '17', j: 3 } ], css_id: 'tinytable_css_eevi2zytiecv3vliqc5d',}, 
-          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_elbxv9ask2rvwv1n49vb',}, 
-          { positions: [ { i: '18', j: 1 } ], css_id: 'tinytable_css_tiwzvcdfqaxvrubmljqs',}, 
-          { positions: [ { i: '10', j: 1 } ], css_id: 'tinytable_css_6ui5cazh17yicktfenlj',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 }, { i: '15', j: 1 }, { i: '16', j: 1 }, { i: '17', j: 1 } ], css_id: 'tinytable_css_m1hj8sq6eqhvsunwtyqe',}, 
-          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_q6ovlnsvcbl49zouqzd3',}, 
+          { positions: [ { i: '18', j: 2 }, { i: '18', j: 3 } ], css_id: 'tinytable_css_7twujrcrailq06i89azt',}, 
+          { positions: [ { i: '10', j: 2 }, { i: '10', j: 3 } ], css_id: 'tinytable_css_b53ft46vh97u8ep1e1eh',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '15', j: 2 }, { i: '16', j: 2 }, { i: '17', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '15', j: 3 }, { i: '16', j: 3 }, { i: '17', j: 3 } ], css_id: 'tinytable_css_tye36t0tfftgfvldgsyq',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_hd0zq1dx7qgqilx3c0ux',}, 
+          { positions: [ { i: '18', j: 1 } ], css_id: 'tinytable_css_cxfqn9d4uq7ey9u403bw',}, 
+          { positions: [ { i: '10', j: 1 } ], css_id: 'tinytable_css_a554a3ityxugb768c9xs',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 }, { i: '15', j: 1 }, { i: '16', j: 1 }, { i: '17', j: 1 } ], css_id: 'tinytable_css_mmsl4yflzkdurm53dyc1',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_3wwm59bb6fro8eqqg2fh',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_9l5rdlomddi5rjda50vl.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_jfjfnv1clsmuk4oti4gp.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -2950,17 +2950,17 @@ line-height: var(--tt-line-height-footnote-tight);
 </style>
     <style>
 
-#tinytable_9l5rdlomddi5rjda50vl td.tinytable_css_3t5n14kydmzl0v76djzp, #tinytable_9l5rdlomddi5rjda50vl th.tinytable_css_3t5n14kydmzl0v76djzp { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-#tinytable_9l5rdlomddi5rjda50vl td.tinytable_css_2qfukyblwjbxx5fs55aq, #tinytable_9l5rdlomddi5rjda50vl th.tinytable_css_2qfukyblwjbxx5fs55aq { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-#tinytable_9l5rdlomddi5rjda50vl td.tinytable_css_eevi2zytiecv3vliqc5d, #tinytable_9l5rdlomddi5rjda50vl th.tinytable_css_eevi2zytiecv3vliqc5d { text-align: center }
-#tinytable_9l5rdlomddi5rjda50vl td.tinytable_css_elbxv9ask2rvwv1n49vb, #tinytable_9l5rdlomddi5rjda50vl th.tinytable_css_elbxv9ask2rvwv1n49vb { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-#tinytable_9l5rdlomddi5rjda50vl td.tinytable_css_tiwzvcdfqaxvrubmljqs, #tinytable_9l5rdlomddi5rjda50vl th.tinytable_css_tiwzvcdfqaxvrubmljqs { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-#tinytable_9l5rdlomddi5rjda50vl td.tinytable_css_6ui5cazh17yicktfenlj, #tinytable_9l5rdlomddi5rjda50vl th.tinytable_css_6ui5cazh17yicktfenlj { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-#tinytable_9l5rdlomddi5rjda50vl td.tinytable_css_m1hj8sq6eqhvsunwtyqe, #tinytable_9l5rdlomddi5rjda50vl th.tinytable_css_m1hj8sq6eqhvsunwtyqe { text-align: left }
-#tinytable_9l5rdlomddi5rjda50vl td.tinytable_css_q6ovlnsvcbl49zouqzd3, #tinytable_9l5rdlomddi5rjda50vl th.tinytable_css_q6ovlnsvcbl49zouqzd3 { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+#tinytable_jfjfnv1clsmuk4oti4gp td.tinytable_css_7twujrcrailq06i89azt, #tinytable_jfjfnv1clsmuk4oti4gp th.tinytable_css_7twujrcrailq06i89azt { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+#tinytable_jfjfnv1clsmuk4oti4gp td.tinytable_css_b53ft46vh97u8ep1e1eh, #tinytable_jfjfnv1clsmuk4oti4gp th.tinytable_css_b53ft46vh97u8ep1e1eh { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+#tinytable_jfjfnv1clsmuk4oti4gp td.tinytable_css_tye36t0tfftgfvldgsyq, #tinytable_jfjfnv1clsmuk4oti4gp th.tinytable_css_tye36t0tfftgfvldgsyq { text-align: center }
+#tinytable_jfjfnv1clsmuk4oti4gp td.tinytable_css_hd0zq1dx7qgqilx3c0ux, #tinytable_jfjfnv1clsmuk4oti4gp th.tinytable_css_hd0zq1dx7qgqilx3c0ux { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+#tinytable_jfjfnv1clsmuk4oti4gp td.tinytable_css_cxfqn9d4uq7ey9u403bw, #tinytable_jfjfnv1clsmuk4oti4gp th.tinytable_css_cxfqn9d4uq7ey9u403bw { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+#tinytable_jfjfnv1clsmuk4oti4gp td.tinytable_css_a554a3ityxugb768c9xs, #tinytable_jfjfnv1clsmuk4oti4gp th.tinytable_css_a554a3ityxugb768c9xs { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+#tinytable_jfjfnv1clsmuk4oti4gp td.tinytable_css_mmsl4yflzkdurm53dyc1, #tinytable_jfjfnv1clsmuk4oti4gp th.tinytable_css_mmsl4yflzkdurm53dyc1 { text-align: left }
+#tinytable_jfjfnv1clsmuk4oti4gp td.tinytable_css_3wwm59bb6fro8eqqg2fh, #tinytable_jfjfnv1clsmuk4oti4gp th.tinytable_css_3wwm59bb6fro8eqqg2fh { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --line-type-bottom: solid; --line-type-left: solid; --line-type-right: solid; --line-type-top: solid; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
 </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_9l5rdlomddi5rjda50vl" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_jfjfnv1clsmuk4oti4gp" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -3067,12 +3067,12 @@ line-height: var(--tt-line-height-footnote-tight);
 <!-- hack to avoid NA insertion in last line -->
 </div>
 </div>
-<p>Escreva sua interpretação SUCINTA aqui.</p>
+<p>Ponderar por população atribui maior peso aos condados mais populosos, o que alterou significativamente os coeficientes e intensificou o efeito negativo do tabagismo sobre a expectativa de vida. Essa abordagem reflete o comportamento de condados maiores, mas difere do uso do inverso da variância do erro, que visa corrigir a heterocedasticidade para aumentar a eficiência. Portanto, a ponderação populacional altera a representatividade da estimativa, mas não resolve o problema da heterocedasticidade, nem garante a constância da variância dos erros.</p>
 </section>
 <section id="questão-3-erros-padrão-robustos-a-agrupamentos" class="level2">
 <h2 class="anchored" data-anchor-id="questão-3-erros-padrão-robustos-a-agrupamentos">Questão 3: Erros-padrão robustos a agrupamentos</h2>
 <p><strong>a.</strong> Explique por que os erros das duas observações pertencentes ao mesmo condado podem estar correlacionados.</p>
-<p>Escreva sua resposta SUCINTA aqui.</p>
+<p>Duas observações do mesmo condado compartilham características locais não observadas, que afetam a expectativa de vida das duas de forma parecida. Por exemplo, a qualidade do sistema de saúde, o acesso a hospitais, condições ambientais, entre outros. Isso faz os erros dessas observações serem correlacionados, e não independentes.</p>
 <p><strong>b.</strong> Estime o modelo com erros-padrão robustos a agrupamentos e agrupamento por condado. Apresente os resultados.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estima o modelo com erros-padrão robustos a agrupamentos por condado</span></span>
@@ -3099,7 +3099,7 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 RMSE: 1.35591   Adj. R2: 0.874058</code></pre>
 </div>
 </div>
-<p>Escreva sua interpretação SUCINTA aqui.</p>
+<p>Os coeficientes são idênticos ao modelo original. O erro-padrão do termo de interação ficou próximo do HC3 e a interação continua altamente significativa.</p>
 <p><strong>c.</strong> Compare o agrupamento por condado com HC3 e avalie se as conclusões mudam.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare os erros-padrão HC3 e agrupados por condado</span></span>
@@ -3119,7 +3119,7 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 RMSE: 1.35591   Adj. R2: 0.874058</code></pre>
 </div>
 </div>
-<p>Escreva sua interpretação SUCINTA aqui.</p>
+<p>Os erros-padrão agrupados por condado ficaram bem próximos dos HC3 e nenhuma conclusão de significância é alterada.</p>
 <p><strong>d.</strong> Estime o modelo com agrupamento por estado e compare HC3, agrupamento por condado e agrupamento por estado.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estima o modelo com erros-padrão robustos a agrupamentos por estado</span></span>
@@ -3146,9 +3146,9 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 RMSE: 1.35591   Adj. R2: 0.874058</code></pre>
 </div>
 </div>
-<p>Escreva sua interpretação SUCINTA aqui.</p>
+<p>Ao agrupar por estado, todos os erros-padrão ficaram bem maiores, visto que o da interação quase dobrou. Menos grupos deixam a estimativa da variância menos precisa, exigindo erros-padrão mais conservadores. Ou seja, a interação deixou de ser tão significativa. Portanto, a conclusão ainda se sustenta, mas com margem bem mais estreita.</p>
 <p><strong>e.</strong> Sintetize o que os resultados sugerem sobre tabagismo e expectativa de vida, mencionando viés de variável omitida, heterocedasticidade e agrupamento. Diferencie associação de causalidade e discuta a adequação da matriz de covariância.</p>
-<p>Escreva sua resposta SUCINTA aqui.</p>
+<p>Os resultados mostram uma associação negativa entre tabagismo e expectativa de vida. Porém, se a variável renda for omitida do modelo, essa associação aparece exagerada. Os dados também são heterocedásticos, então os erros-padrão comuns do MQO não servem para inferência. É preciso corrigi-los, como com o HC3. Além disso, como cada condado tem duas observações, os erros dessas observações podem estar correlacionados. O HC3 corrige a heterocedasticidade, mas não considera essa dependência. O agrupamento por condado permite essa correlação. Já o agrupamento por estado também contempla essa correlação e, além disso, permite dependência entre diferentes condados do mesmo estado. Como são apenas 50 estados, essa última inferência exige mais cautela. Por fim, esses resultados mostram apenas associações, não uma relação de causa e efeito, já que os dados são observacionais.</p>
 </section>
 
 </main>

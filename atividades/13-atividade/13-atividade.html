@@ -2370,7 +2370,7 @@ window.Quarto = {
       <div>
       <div class="quarto-title-meta-heading">Data de Publicação</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">17 de novembro de 2026</p>
+        <p class="date">22 de novembro de 2026</p>
       </div>
     </div>
     
@@ -2797,28 +2797,30 @@ tratado:depois -9.75  0.608</code></pre>
 \begin{aligned}
 \Delta\bar Y_C
 &amp;=\bar Y_{C,1}-\bar Y_{C,0}\\
-&amp;=\ldots\text{ pontos percentuais}.
+&amp;=21{,}358-26{,}130\\
+&amp;=-4{,}772\text{ pontos percentuais}.
 \end{aligned}
 \]</span></p>
 <p><span class="math display">\[
 \begin{aligned}
 \widehat{\bar Y}_{T,1}^{(0)}
 &amp;=\bar Y_{T,0}+\Delta\bar Y_C\\
-&amp;=\ldots
+&amp;=19{,}941+(-4{,}772)\\
+&amp;=15{,}169\%.
 \end{aligned}
 \]</span></p>
-<p><em>Escreva aqui sua interpretação do resultado contrafactual.</em></p>
+<p>No grupo de controle, a proporção de pessoas sem seguro-saúde caiu 4,772 pontos percentuais entre 2013 e 2015. Aplicando essa mesma variação aos estados tratados, estimamos que, sem a expansão do Medicaid, 15,169% das pessoas desses estados estariam sem seguro em 2015 (contrafactual). Isso vale sob a hipótese de tendências paralelas.</p>
 <hr>
 <p><strong>b)</strong> Compare o contrafactual estimado com a proporção efetivamente observada nos estados tratados em 2015. Subtraia o valor contrafactual do valor observado e interprete a diferença obtida.</p>
 <p><strong>Resposta:</strong></p>
 <p><span class="math display">\[
 \begin{aligned}
 \bar Y_{T,1}-\widehat{\bar Y}_{T,1}^{(0)}
-&amp;=\ldots\\
-&amp;=\ldots\text{ pontos percentuais}.
+&amp;=10{,}598-15{,}169\\
+&amp;=-4{,}571\text{ pontos percentuais}.
 \end{aligned}
 \]</span></p>
-<p><em>Escreva aqui sua comparação e a interpretação da diferença obtida.</em></p>
+<p>Em 2015, a proporção de pessoas sem seguro nos estados tratados (10,598%) ficou 4,571 pontos percentuais abaixo da que esperaríamos sem a expansão (15,169%). Esse valor é igual ao coeficiente <code>tratado:depois</code> da regressão (<span class="math inline">\(-0{,}0457\)</span>, ou <span class="math inline">\(-4{,}571\)</span> p.p.).</p>
 <hr>
 <p><strong>c)</strong> Utilize as variações observadas nos grupos tratado e de controle para calcular o estimador DiD.</p>
 <p>Compare esse resultado com o obtido no item <strong>b</strong> e explique:</p>
@@ -2831,20 +2833,28 @@ tratado:depois -9.75  0.608</code></pre>
 \begin{aligned}
 \Delta\bar Y_T
 &amp;=\bar Y_{T,1}-\bar Y_{T,0}\\
-&amp;=\ldots\text{ pontos percentuais}.
+&amp;=10{,}598-19{,}941\\
+&amp;=-9{,}343\text{ pontos percentuais}.
 \end{aligned}
 \]</span></p>
 <p><span class="math display">\[
 \begin{aligned}
 \widehat{\delta}_{DiD}
 &amp;=\Delta\bar Y_T-\Delta\bar Y_C\\
-&amp;=\ldots\text{ pontos percentuais}.
+&amp;=-9{,}343-(-4{,}772)\\
+&amp;=-4{,}571\text{ pontos percentuais}.
 \end{aligned}
 \]</span></p>
 <p><strong>Por que os dois procedimentos produzem o mesmo resultado?</strong></p>
-<p><em>Escreva aqui sua explicação.</em></p>
+<p>Porque são a mesma conta escrita de duas formas. Como o contrafactual é <span class="math inline">\(\bar Y_{T,0}+\Delta\bar Y_C\)</span>:</p>
+<p><span class="math display">\[
+\bar Y_{T,1}-\widehat{\bar Y}_{T,1}^{(0)}
+=\bar Y_{T,1}-\bar Y_{T,0}-\Delta\bar Y_C
+=\Delta\bar Y_T-\Delta\bar Y_C.
+\]</span></p>
+<p>Nos dois casos, descontamos da variação dos estados tratados a variação que também ocorreu no grupo de controle. O resultado (<span class="math inline">\(-4{,}571\)</span> p.p.) é igual ao coeficiente <code>tratado:depois</code> da regressão.</p>
 <p><strong>Por que não podemos atribuir toda a redução observada à expansão do Medicaid?</strong></p>
-<p><em>Escreva aqui sua explicação.</em></p>
+<p>Porque a queda de 9,343 p.p. nos estados tratados inclui uma queda de 4,772 p.p. que também ocorreu nos estados de controle, que não expandiram o Medicaid. Essa parte vem de outros fatores comuns aos dois grupos e não pode ser atribuída à política. Só a parte que excede a queda do controle (<span class="math inline">\(-4{,}571\)</span> p.p.) pode ser associada à expansão, e apenas se a hipótese de tendências paralelas for válida, o que não é testado aqui. A estimativa também é imprecisa: o erro-padrão agrupado é de cerca de 2,556 p.p. (valor-p = 0,0819), e o intervalo de confiança de 95% (de cerca de <span class="math inline">\(-9{,}75\)</span> a <span class="math inline">\(0{,}61\)</span> p.p.) inclui o zero.</p>
 </section>
 </section>
 
